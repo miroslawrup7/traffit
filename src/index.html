@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,8 +9,96 @@
     <title>Grupa Progres</title>
 </head>
 <body>
+    <header></header>
+    <main>
+        <div class="filters">
+
+            <div class="search">
+                <div class="search-input">
+                    <input type="text">
+                </div>
+                <div class="search-btn">
+                    Szukaj
+                </div>
+            </div>
+
+            <div class="info-bar">
+                <div class="clear-filters">Usuń wszystkie filtry</div>
+                <div class="records-number"></div>
+            </div>
+
+            <div class="salary">
+                <div class="values unactive">
+                    <span id="range1">0</span>
+                    <span>&nbsp;-&nbsp;</span>
+                    <span id="range2">50000</span>
+                </div>
+                <div class="slider-container">
+                    <div class="checkbox-container">
+                        <label class="checkbox">
+                            <input type="checkbox" id="salary-mark" name="salary-mark" value="salary-mark">
+                            <span class="checkmark"></span>
+                            <span class="label-text">Stawka</span>
+                        </label>
+                    </div>
+                    <div class="container unactive">
+                        <div class="slider-track"></div>
+                        <input type="range" min="0" max="50000" value="0" step="100" id="slider-1" oninput="slideOne()" disabled>
+                        <input type="range" min="0" max="50000" value="50000" step="100" id="slider-2" oninput="slideTwo()" disabled>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checkboxes">
+                <div class="checkbox-container">
+                    <label class="checkbox">
+                        <input type="checkbox" id="remote" name="remote" value="remote">
+                        <span class="checkmark"></span>
+                        <span class="label-text">Praca zdalna</span>
+                    </label>
+                </div>
+                <div class="checkbox-container">
+                    <label class="checkbox">
+                        <input type="checkbox" id="relocation" name="relocation" value="relocation">
+                        <span class="checkmark"></span>
+                        <span class="label-text">Bonus relokacja</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="lists">
+                <div class="list">
+                    <label for="branches">Branża</label>
+                    <select class="branches" name="branches" id="branches" multiple></select>
+                </div>
+
+                <div class="list">
+                    <label for="job-form">Forma zatrudnienia</label>
+                    <select class="job-form" name="job-form" id="job-form" multiple></select>
+                </div>
+
+                <div class="list">
+                    <label for="job-type">Rodzaj pracy</label>
+                    <select class="job-type" name="job-type" id="job-type" multiple></select>
+                </div>
+
+                <div class="list">
+                    <label for="lang">Język</label>
+                    <select class="lang" name="lang" id="lang" multiple></select>
+                </div>
+
+            </div>
+
+            
+            
+        </div>
+        <div class="results"></div>
+    </main>
+    <footer></footer>
    
-   
+    <!-- <div id="traffit-an-filters-xtxrxaxfxixtx2x0x1x6x"></div>
+    <div id="traffit-an-list-xtxrxaxfxixtx2x0x1x6x"></div>
+    <script type="application/javascript" src="https://grupaprogres.traffit.com/public/an/generateJs/"></script> -->
     <script src="./js/all.min.js?cache_bust=123"></script>
 </body>
 </html>
