@@ -5,6 +5,9 @@ $primary-color: #fe7320;
 $primary-color-light: #fe732038;
 $font-color: #37474F;
 
+$color-rec-1: #20abfe;
+$color-rec-2: #6bc424;
+
 * {
     margin: 0;
     padding: 0;
@@ -26,6 +29,22 @@ body {
 main {
     max-width: 1024px;
     margin: 0 auto;
+}
+
+.pt-border {
+    border: 2px solid $color-rec-1;
+}
+
+.rs-border {
+    border: 2px solid $color-rec-2;
+}
+
+.pt-text {
+    color: $color-rec-1;
+}
+
+.rs-text {
+    color: $color-rec-2;
 }
 
 .unactive {
@@ -495,5 +514,27 @@ main {
                 }
             }
         }
+    }
+}
+
+.no-results {
+    display: none;
+    z-index: -1;
+ 
+    &.active {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: url("../img/frown.svg") no-repeat;
+        background-position: center;
+        width: 100%;
+        height: 100%;
+        opacity: 0.1;
+        background-size: contain;
+
+    }
+    img {
+        width: 50%;
     }
 }

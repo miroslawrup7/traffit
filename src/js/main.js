@@ -22,6 +22,11 @@ const salaryValuesLoc = document.querySelector(".values");
 const salaryMinDotLoc = document.querySelector("#slider-1");
 const salaryMaxDotLoc = document.querySelector("#slider-2");
 
+const searchInputLoc = document.querySelector(".search-input input");
+
+const clearFiltersLoc = document.querySelector(".clear-filters");
+const noResultsLoc = document.querySelector(".no-results");
+
 let apiPage = 1;
 let apiDataLength = 0;
 
@@ -103,6 +108,12 @@ const getAPIPage = (apiPage, filterObj) => {
         .then((fetchObj) => {
             apiDataLength = fetchObj.apiArrayLen;
             if (apiDataLength > 0) {
+                if (apiPage === 1) {
+                    resultsLoc.replaceChildren();
+                    // recNumLoc.replaceChildren();
+                    recordsNumber = 0;
+                }
+
                 showDataInHtml(fetchObj.apiArray, filterObj);
             } else {
                 if (isEmpty) {
@@ -115,15 +126,19 @@ const getAPIPage = (apiPage, filterObj) => {
                         filterMaxSalary
                     );
                 }
-                recNumLoc.insertAdjacentHTML(
-                    "beforeend",
-                    `Znaleziono ${recordsNumber} ogłoszeń`
-                );
+                recNumLoc.innerText = `Znaleziono ${recordsNumber} ogłoszeń`;
+                if (!recordsNumber) {
+                    noResultsLoc.classList.add("active");
+                } else {
+                    noResultsLoc.classList.remove("active");
+                }
             }
         });
 };
 
 getAPIPage(apiPage, filterObj);
+
+// recordsNumber = 0;
 
 const showDataInHtml = (apiData, filterObj) => {
     isEmpty = Object.keys(filterObj).length === 0;
@@ -313,10 +328,34 @@ const showDataInHtml = (apiData, filterObj) => {
                     return false;
                 }
             }
+
+            // search text
+            if (filterObj.searchText) {
+                let foundWord = false;
+                let position = -1;
+                el.advert.values.forEach(function (elem) {
+                    if (elem.value && elem.field_id !== "geolocation") {
+                        position = elem.value
+                            .toLowerCase()
+                            .search(filterObj.searchText.toLowerCase());
+                        if (position !== -1) {
+                            foundWord = true;
+                        }
+                    }
+                });
+                position = el.advert.name
+                    .toLowerCase()
+                    .search(filterObj.searchText.toLowerCase());
+                if (position !== -1) {
+                    foundWord = true;
+                }
+                if (!foundWord) {
+                    return false;
+                }
+            }
         }
 
         // records
-
         recordsNumber++;
 
         if (el.options.job_location) {
@@ -331,9 +370,25 @@ const showDataInHtml = (apiData, filterObj) => {
             });
         }
 
+        // record Color
+
+        let borderColorClass = "";
+        let textColorClass = "";
+
+        if (el.options._rekrutacja_rodzaj === "PT") {
+            borderColorClass = "pt-border";
+            textColorClass = "pt-text";
+        }
+        if (el.options._rekrutacja_rodzaj === "RS") {
+            borderColorClass = "rs-border";
+            textColorClass = "rs-text";
+        }
+
         resultsLoc.insertAdjacentHTML(
             "beforeend",
-            `<a href="${el.url}" target="_blank"><div class="result">
+            `<a href="${
+                el.url
+            }" target="_blank"><div class="result ${borderColorClass}">
                 <div class="top">
                     <div class="top-left">
                         <div class="lang"><p>${el.advert.language}</p></div>
@@ -341,7 +396,9 @@ const showDataInHtml = (apiData, filterObj) => {
                             <div class="branche">${
                                 el.options.branches ? el.options.branches : ""
                             }</div>
-                            <div class="name">${el.advert.name}</div>
+                            <div class="name ${textColorClass}">${
+                el.advert.name
+            }</div>
                         </div>
                     </div>
                     <div class="top-right">
@@ -502,14 +559,6 @@ const getFilteredData = () => {
 
     // create filter Obj
 
-    searchBtn.style.pointerEvents = "none";
-
-    const turnOnSearchBtn = () => {
-        searchBtn.style.pointerEvents = "auto";
-    };
-
-    setTimeout(turnOnSearchBtn, 3000);
-
     filterObj = {};
 
     let selectedBranches = Array.from(branchesChildrenLoc)
@@ -554,6 +603,9 @@ const getFilteredData = () => {
         selectedValTwo = displayValTwo.innerText;
     }
 
+    if (searchInputLoc.value !== "") {
+    }
+
     filterObj.branchesFiltr = selectedBranches;
     filterObj.jobFormsFiltr = selectedJobForms;
     filterObj.jobTypesFiltr = selectedJobTypes;
@@ -561,6 +613,7 @@ const getFilteredData = () => {
     filterObj.remoteFiltr = selectedRemote;
     filterObj.relocationFiltr = selectedRelocation;
     filterObj.salary = [selectedValOne, selectedValTwo];
+    filterObj.searchText = searchInputLoc.value;
 
     // reset initialvalue
     apiPage = 1;
@@ -568,10 +621,13 @@ const getFilteredData = () => {
     recordsNumber = 0;
 
     getAPIPage(apiPage, filterObj);
-
-    // delete data in DOM
-    resultsLoc.replaceChildren();
-    recNumLoc.replaceChildren();
 };
 
 searchBtn.addEventListener("click", getFilteredData);
+
+const clearFilters = () => {
+    searchInputLoc.value = "";
+    window.location.reload();
+};
+
+clearFiltersLoc.addEventListener("click", clearFilters);
