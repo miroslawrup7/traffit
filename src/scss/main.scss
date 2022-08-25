@@ -7,6 +7,7 @@ $font-color: #37474F;
 
 $color-rec-1: #20abfe;
 $color-rec-2: #6bc424;
+$color-rec-3: #fe7320;
 $dangerColor: #ff0000;
 
 * {
@@ -25,6 +26,7 @@ $dangerColor: #ff0000;
 body {
     background-color: #F4F4F4;
     color: $font-color;
+    overflow-y: scroll;
 }
 
 main {
@@ -36,271 +38,110 @@ main {
     border: 2px solid $color-rec-1;
 }
 
-.rs-border {
-    border: 2px solid $color-rec-2;
-}
-
 .pt-text {
     color: $color-rec-1;
+}
+
+.rs-border {
+    border: 2px solid $color-rec-2;
 }
 
 .rs-text {
     color: $color-rec-2;
 }
 
+.wew-border {
+    border: 2px solid $color-rec-3;
+}
+
+.wew-text {
+    color: $color-rec-3;
+}
+
+
 .unactive {
     opacity: 0.3;
     filter: grayscale(100%);
 }
 
+.checkbox-container {
+    margin: 10px 20px;
+    display: block;
+    width: 150px;
+    .checkbox {
+        display: block;
+        position: relative;
+        height: 20px;
+        width: 20px;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+
+        /* Hide the browser's default checkbox */
+        input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Create a custom checkbox */
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background-color: #fff;
+            border: 1px $font-color solid;
+            border-radius: 3px;
+        }
+        /* On mouse-over, add a grey background color */
+        &:hover input ~ .checkmark {
+            background-color: $primary-color-light;
+        }
+        /* When the checkbox is checked, add a blue background */
+        input:checked ~ .checkmark {
+            background-color: $primary-color;
+            border: 1px $primary-color solid;
+        }
+        /* Create the checkmark/indicator (hidden when not checked) */
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+        /* Show the checkmark when checked */
+        input:checked ~ .checkmark:after {
+            display: block;
+        }
+        /* Style the checkmark/indicator */
+        .checkmark:after {
+            left: 5px;
+            top: 2px;
+            width: 5px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            -webkit-transform: rotate(35deg);
+            -ms-transform: rotate(35deg);
+            transform: rotate(35deg);
+        }
+        .label-text {
+            position: relative;
+            display: inline-block;
+            left: 25px;
+            font-size: 14px;
+            width: max-content;
+        }
+    }
+}
+
 .filters {
     margin-top: 30px;
-    .lists {
-        display: flex;
-        justify-content: space-around;
-        .list {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            label {
-                margin-bottom: 5px;
-                border-bottom: 2px solid $primary-color;
-                width: 100%;
-                text-align: center;
-            }
-            select {
-                margin: 0 10px 10px 10px;
-                scrollbar-width: none; 
-                -ms-overflow-style: none;
-                min-width: 150px;
-                option {
-                    margin: 1px 0;
-                    padding: 2px 5px;
-                }
-                option:hover {
-                    background: $primary-color-light;
-                }
-                option:checked {
-                    background: $primary-color;
-                    color:white;
-                }
-            }
-            select[multiple]:focus option:checked {
-                background: $primary-color linear-gradient(0deg, $primary-color 0%, $primary-color 100%);
-            }
-            select::-webkit-scrollbar {
-                display: none;
-            }
-            .clear-list {
-                font-size: 11px;
-                color: $font-color;
-                opacity: 0.5;
-                cursor: pointer;
-                &:hover {
-                    color: $dangerColor;
-                    font-weight: bold;
-                }
-            }
-
-        }
-    }
-    .salary {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 20px;
-        .values {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: -15px;
-        }
-        .slider-container {
-            display: flex;
-            .checkbox-container {
-                display: flex;
-                align-items: center;
-                margin-right: 10px;
-                width: 90px;
-            }
-            .container {
-                width: 100%;
-                position: relative;
-                height: 50px;
-                .slider-track {
-                    width: 100%;
-                    height: 2px;
-                    position: absolute;
-                    top: 0;
-                    bottom: 0;
-                    margin: auto;
-                    border-radius: 5px;
-                }
-                input[type="range"] {
-                    appearance: none;
-                    width: 100%;
-                    outline: none;
-                    position: absolute;
-                    top: 0;
-                    bottom: 0;
-                    margin: auto;
-                    background-color: transparent;
-                    pointer-events: none;
-                }
-            
-                input[type="range"]::-webkit-slider-runnable-track {
-                    -webkit-appearance: none;
-                    height: 5px;
-                }
-                input[type="range"]::-moz-range-track {
-                    -moz-appearance: none;
-                    height: 5px;
-                }
-                input[type="range"]::-ms-track  {
-                    appearance: none;
-                    height: 5px;
-                }
-
-                input[type="range"]::-webkit-slider-thumb {
-                    -webkit-appearance: none;
-                    height: 15px;
-                    width: 15px;
-                    background-color: $primary-color;
-                    border: solid 2px $primary-color; 
-                    cursor: pointer;
-                    border-radius: 50%;
-                    pointer-events: auto;
-                }
-                input[type="range"]::-moz-range-thumb {
-                    -moz-appearance: none;
-                    height: 15px;
-                    width: 15px;
-                    outline: none;
-                    background-color: $primary-color;
-                    border: solid 2px $primary-color; 
-                    cursor: pointer;
-                    border-radius: 50%;
-                    pointer-events: auto;
-                }
-                input[type="range"]::-ms-thumb {
-                    appearance: none;
-                    height: 15px;
-                    width: 15px;
-                    background-color: $primary-color;
-                    border: solid 2px $primary-color; 
-                    cursor: pointer;
-                    border-radius: 50%;
-                    pointer-events: auto;
-                }
-
-                input[type="range"]:active::-webkit-slider-thumb {
-                    background-color: #FFFFFF;
-                    border: solid 2px $primary-color; 
-                }
-                input[type="range"]:active::-moz-range-thumb {
-                    background-color: #FFFFFF;
-                    border: solid 2px $primary-color; 
-                }
-                input[type="range"]:active::-ms-thumb {
-                    background-color: #FFFFFF;
-                    border: solid 2px $primary-color; 
-                }
-
-                input[type="range"]:hover::-webkit-slider-thumb {
-                    outline: 10px solid $primary-color-light
-                }
-
-                input[type="range"]:hover::-moz-range-thumb {
-                    outline: 10px solid $primary-color-light
-                }
-
-                input[type="range"]:hover::-ms-thumb {
-                    outline: 10px solid $primary-color-light
-                }
-            }
-        }
-    }
-    .checkboxes {
-        display: flex;
-        margin-bottom: 30px;
-        justify-content: center;
-    }
-
-    .checkbox-container {
-        margin: 10px 20px;
-        display: block;
-        width: 150px;
-        .checkbox {
-            display: block;
-            position: relative;
-            height: 20px;
-            width: 20px;
-            cursor: pointer;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-
-            /* Hide the browser's default checkbox */
-            input {
-                position: absolute;
-                opacity: 0;
-                cursor: pointer;
-                height: 100%;
-                width: 100%;
-            }
-
-            /* Create a custom checkbox */
-            .checkmark {
-                position: absolute;
-                top: 0;
-                left: 0;
-                height: 100%;
-                width: 100%;
-                background-color: #fff;
-                border: 1px $font-color solid;
-                border-radius: 3px;
-            }
-            /* On mouse-over, add a grey background color */
-            &:hover input ~ .checkmark {
-                background-color: $primary-color-light;
-            }
-            /* When the checkbox is checked, add a blue background */
-            input:checked ~ .checkmark {
-                background-color: $primary-color;
-                border: 1px $primary-color solid;
-            }
-            /* Create the checkmark/indicator (hidden when not checked) */
-            .checkmark:after {
-                content: "";
-                position: absolute;
-                display: none;
-            }
-            /* Show the checkmark when checked */
-            input:checked ~ .checkmark:after {
-                display: block;
-            }
-            /* Style the checkmark/indicator */
-            .checkmark:after {
-                left: 5px;
-                top: 2px;
-                width: 5px;
-                height: 9px;
-                border: solid white;
-                border-width: 0 2px 2px 0;
-                -webkit-transform: rotate(35deg);
-                -ms-transform: rotate(35deg);
-                transform: rotate(35deg);
-            }
-            .label-text {
-                position: relative;
-                display: inline-block;
-                left: 25px;
-                font-size: 14px;
-                width: max-content;
-            }
-        }
-    }
-
     .search {
         display:flex;
         justify-content: right;
@@ -352,10 +193,230 @@ main {
             }
         }
     }
+    .drop-down-filters {
+        max-height: 0;
+        opacity: 0;
+        transition: all 1s;
+        &.show {
+            opacity: 1;
+        }
+        .salary {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+            .values {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-bottom: -15px;
+            }
+            .slider-container {
+                display: flex;
+                .checkbox-container {
+                    display: flex;
+                    align-items: center;
+                    margin-right: 10px;
+                    width: 90px;
+                }
+                .container {
+                    width: 100%;
+                    position: relative;
+                    height: 50px;
+                    .slider-track {
+                        width: 100%;
+                        height: 2px;
+                        position: absolute;
+                        top: 0;
+                        bottom: 0;
+                        margin: auto;
+                        border-radius: 5px;
+                    }
+                    input[type="range"] {
+                        appearance: none;
+                        width: 100%;
+                        outline: none;
+                        position: absolute;
+                        top: 0;
+                        bottom: 0;
+                        margin: auto;
+                        background-color: transparent;
+                        pointer-events: none;
+                    }
+                
+                    input[type="range"]::-webkit-slider-runnable-track {
+                        -webkit-appearance: none;
+                        height: 5px;
+                    }
+                    input[type="range"]::-moz-range-track {
+                        -moz-appearance: none;
+                        height: 5px;
+                    }
+                    input[type="range"]::-ms-track  {
+                        appearance: none;
+                        height: 5px;
+                    }
+
+                    input[type="range"]::-webkit-slider-thumb {
+                        -webkit-appearance: none;
+                        height: 15px;
+                        width: 15px;
+                        background-color: $primary-color;
+                        border: solid 2px $primary-color; 
+                        cursor: pointer;
+                        border-radius: 50%;
+                        pointer-events: auto;
+                    }
+                    input[type="range"]::-moz-range-thumb {
+                        -moz-appearance: none;
+                        height: 15px;
+                        width: 15px;
+                        outline: none;
+                        background-color: $primary-color;
+                        border: solid 2px $primary-color; 
+                        cursor: pointer;
+                        border-radius: 50%;
+                        pointer-events: auto;
+                    }
+                    input[type="range"]::-ms-thumb {
+                        appearance: none;
+                        height: 15px;
+                        width: 15px;
+                        background-color: $primary-color;
+                        border: solid 2px $primary-color; 
+                        cursor: pointer;
+                        border-radius: 50%;
+                        pointer-events: auto;
+                    }
+
+                    input[type="range"]:active::-webkit-slider-thumb {
+                        background-color: #FFFFFF;
+                        border: solid 2px $primary-color; 
+                    }
+                    input[type="range"]:active::-moz-range-thumb {
+                        background-color: #FFFFFF;
+                        border: solid 2px $primary-color; 
+                    }
+                    input[type="range"]:active::-ms-thumb {
+                        background-color: #FFFFFF;
+                        border: solid 2px $primary-color; 
+                    }
+
+                    input[type="range"]:hover::-webkit-slider-thumb {
+                        outline: 10px solid $primary-color-light
+                    }
+
+                    input[type="range"]:hover::-moz-range-thumb {
+                        outline: 10px solid $primary-color-light
+                    }
+
+                    input[type="range"]:hover::-ms-thumb {
+                        outline: 10px solid $primary-color-light
+                    }
+                }
+            }
+        }
+        .checkboxes {
+            display: flex;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        .lists {
+            display: flex;
+            justify-content: space-around;
+            .list {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                label {
+                    margin-bottom: 5px;
+                    border-bottom: 2px solid $primary-color;
+                    width: 100%;
+                    text-align: center;
+                }
+                select {
+                    margin: 0 10px 10px 10px;
+                    scrollbar-width: none; 
+                    -ms-overflow-style: none;
+                    min-width: 150px;
+                    option {
+                        margin: 1px 0;
+                        padding: 2px 5px;
+                    }
+                    option:hover {
+                        background: $primary-color-light;
+                    }
+                    option:checked {
+                        background: $primary-color;
+                        color:white;
+                    }
+                }
+                select[multiple]:focus option:checked {
+                    background: $primary-color linear-gradient(0deg, $primary-color 0%, $primary-color 100%);
+                }
+                select::-webkit-scrollbar {
+                    display: none;
+                }
+                .clear-list {
+                    font-size: 11px;
+                    color: $font-color;
+                    opacity: 0.5;
+                    cursor: pointer;
+                    &:hover {
+                        color: $dangerColor;
+                        font-weight: bold;
+                    }
+                }
+            }
+        }
+    }
+    .drop-down-btn {
+        margin: 0 auto;
+        z-index: 1000;
+        width: fit-content;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        font-size: 11px;
+        
+        img {
+            transition: all 0.8s;
+            width: 40px;
+            cursor: pointer;
+            &.up {
+                transform: rotate(-180deg);
+            }
+        }
+        .more-filters {
+            margin-bottom: -10px;
+            overflow: hidden;
+            max-height: 16px;
+            opacity: 1;
+            transition: all 0.8s;
+            &.hide {
+                max-height: 0;
+                opacity: 0;
+            }
+        }
+
+        .less-filters {
+            margin-top: -10px;
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: all 0.8s;
+            &.show {
+                max-height: 16px;
+                opacity: 1;
+            }
+        }
+
+    }
 }
 
 .results {
-    margin: 50px 25px;
+    margin: 25px 25px 50px 25px;
 }
 
 .result {

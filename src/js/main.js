@@ -28,6 +28,11 @@ const clearFiltersLoc = document.querySelector(".clear-filters");
 const clearFilterLoc = document.querySelectorAll(".lists .clear-list");
 const noResultsLoc = document.querySelector(".no-results");
 
+const dropDownFilterLoc = document.querySelector(".drop-down-filters");
+const dropDownBtnLoc = document.querySelector(".drop-down-btn img");
+const moreFiltersLoc = document.querySelector(".more-filters");
+const lessFiltersLoc = document.querySelector(".less-filters");
+
 let apiPage = 1;
 let apiDataLength = 0;
 
@@ -42,6 +47,8 @@ let recordsNumber = 0;
 let isEmpty = true;
 
 let filterObj = {};
+
+let filterListMaxHeight = 0;
 
 remoteLoc.checked = false;
 relocationLoc.checked = false;
@@ -384,6 +391,10 @@ const showDataInHtml = (apiData, filterObj) => {
             borderColorClass = "rs-border";
             textColorClass = "rs-text";
         }
+        if (el.options._rekrutacja_rodzaj === "WEW") {
+            borderColorClass = "wew-border";
+            textColorClass = "wew-text";
+        }
 
         resultsLoc.insertAdjacentHTML(
             "beforeend",
@@ -432,7 +443,7 @@ const showDataInHtml = (apiData, filterObj) => {
                         }</div>
                         ${
                             el.options.remote
-                                ? "<div class='remote'>remote</div>"
+                                ? "<div class='remote'>zdalna</div>"
                                 : ""
                         }
                         ${
@@ -465,6 +476,7 @@ const filterHTML = (
     if (filterBranchesList.length > 0) {
         filterBranchesList.sort();
         rowHeight = filterBranchesList.length * 21 + 3;
+        filterListMaxHeight = rowHeight;
         branchesLoc.style.height = String(rowHeight) + "px";
         filterBranchesList.forEach(function (el) {
             branchesLoc.insertAdjacentHTML(
@@ -643,4 +655,20 @@ clearFilterLoc.forEach((elemFiltr) => {
             }
         });
     });
+});
+
+dropDownBtnLoc.addEventListener("click", () => {
+    dropDownBtnLoc.classList.toggle("up");
+    if (dropDownFilterLoc.classList.contains("show")) {
+        dropDownFilterLoc.classList.remove("show");
+        dropDownFilterLoc.style.maxHeight = String(0) + "px";
+        moreFiltersLoc.classList.remove("hide");
+        lessFiltersLoc.classList.remove("show");
+    } else {
+        dropDownFilterLoc.classList.add("show");
+        dropDownFilterLoc.style.maxHeight =
+            String(filterListMaxHeight + 200) + "px";
+        moreFiltersLoc.classList.add("hide");
+        lessFiltersLoc.classList.add("show");
+    }
 });
