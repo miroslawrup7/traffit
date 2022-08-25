@@ -25,6 +25,7 @@ const salaryMaxDotLoc = document.querySelector("#slider-2");
 const searchInputLoc = document.querySelector(".search-input input");
 
 const clearFiltersLoc = document.querySelector(".clear-filters");
+const clearFilterLoc = document.querySelectorAll(".lists .clear-list");
 const noResultsLoc = document.querySelector(".no-results");
 
 let apiPage = 1;
@@ -631,3 +632,15 @@ const clearFilters = () => {
 };
 
 clearFiltersLoc.addEventListener("click", clearFilters);
+
+clearFilterLoc.forEach((elemFiltr) => {
+    elemFiltr.addEventListener("click", () => {
+        let optArray =
+            elemFiltr.previousElementSibling.querySelectorAll("option");
+        optArray.forEach((elOpt) => {
+            if (elOpt.selected) {
+                elOpt.selected = false;
+            }
+        });
+    });
+});

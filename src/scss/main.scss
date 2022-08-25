@@ -7,6 +7,7 @@ $font-color: #37474F;
 
 $color-rec-1: #20abfe;
 $color-rec-2: #6bc424;
+$dangerColor: #ff0000;
 
 * {
     margin: 0;
@@ -69,8 +70,6 @@ main {
             }
             select {
                 margin: 0 10px 10px 10px;
-                
-                // border: 1px solid blue;
                 scrollbar-width: none; 
                 -ms-overflow-style: none;
                 min-width: 150px;
@@ -92,6 +91,17 @@ main {
             select::-webkit-scrollbar {
                 display: none;
             }
+            .clear-list {
+                font-size: 11px;
+                color: $font-color;
+                opacity: 0.5;
+                cursor: pointer;
+                &:hover {
+                    color: $dangerColor;
+                    font-weight: bold;
+                }
+            }
+
         }
     }
     .salary {
@@ -225,7 +235,6 @@ main {
             height: 20px;
             width: 20px;
             cursor: pointer;
-            // font-size: 22px;
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
@@ -330,8 +339,18 @@ main {
     .info-bar {
         display: flex;
         justify-content: space-between;
-        font-size: 12px;
+        font-size: 11px;
         margin: 10px 0 20px 0;
+        .clear-filters {
+            font-size: 11px;
+            color: $font-color;
+            opacity: 0.5;
+            cursor: pointer;
+            &:hover {
+                color: $dangerColor;
+                font-weight: bold;
+            }
+        }
     }
 }
 
