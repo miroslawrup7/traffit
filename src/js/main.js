@@ -3,12 +3,14 @@ const branchesLoc = document.querySelector(".branches");
 const jobFormLoc = document.querySelector(".job-form");
 const jobTypeLoc = document.querySelector(".job-type");
 const langLoc = document.querySelector(".lang");
+const countriesLoc = document.querySelector(".countries");
+const citiesLoc = document.querySelector(".cities");
 
 const sliderOne = document.getElementById("slider-1");
 const sliderTwo = document.getElementById("slider-2");
 const displayValOne = document.getElementById("range1");
 const displayValTwo = document.getElementById("range2");
-const sliderTrack = document.querySelector(".slider-track");
+const sliderTrack = document.querySelector(".salary .slider-track");
 
 const recNumLoc = document.querySelector(".records-number");
 
@@ -17,8 +19,10 @@ const searchBtn = document.querySelector(".search-btn");
 const remoteLoc = document.querySelector("#remote");
 const relocationLoc = document.querySelector("#relocation");
 const salaryMarkLoc = document.querySelector("#salary-mark");
-const salarySliderLoc = document.querySelector(".slider-container .container");
-const salaryValuesLoc = document.querySelector(".values");
+const salarySliderLoc = document.querySelector(
+    ".salary .slider-container .container"
+);
+const salaryValuesLoc = document.querySelector(".salary .slider-values");
 const salaryMinDotLoc = document.querySelector("#slider-1");
 const salaryMaxDotLoc = document.querySelector("#slider-2");
 
@@ -29,19 +33,33 @@ const clearFilterLoc = document.querySelectorAll(".lists .clear-list");
 const noResultsLoc = document.querySelector(".no-results");
 
 const dropDownFilterLoc = document.querySelector(".drop-down-filters");
+const dropDownLoc = document.querySelector(".drop-down-btn");
 const dropDownBtnLoc = document.querySelector(".drop-down-btn img");
 const moreFiltersLoc = document.querySelector(".more-filters");
 const lessFiltersLoc = document.querySelector(".less-filters");
+
+const locationMarkLoc = document.querySelector("#localization");
+const locationSliderLoc = document.querySelector(
+    ".distance-slider .slider-container .container"
+);
+const locationDotLoc = document.querySelector("#loc-slider");
+const locationValuesLoc = document.querySelector(
+    ".distance-slider .slider-values"
+);
+const displayValThree = document.getElementById("range3");
 
 let apiPage = 1;
 let apiDataLength = 0;
 
 let filterBranchesList = [];
 let filterJobFormList = [];
-let filterjobTypeList = [];
-let filterlangList = [];
+let filterJobTypeList = [];
+let filterLangList = [];
 let filterMinSalary = 100000;
 let filterMaxSalary = 0;
+let filterCountriesList = [];
+let filterCitiesList = [];
+
 let recordsNumber = 0;
 
 let isEmpty = true;
@@ -118,7 +136,6 @@ const getAPIPage = (apiPage, filterObj) => {
             if (apiDataLength > 0) {
                 if (apiPage === 1) {
                     resultsLoc.replaceChildren();
-                    // recNumLoc.replaceChildren();
                     recordsNumber = 0;
                 }
 
@@ -128,8 +145,8 @@ const getAPIPage = (apiPage, filterObj) => {
                     filterHTML(
                         filterBranchesList,
                         filterJobFormList,
-                        filterjobTypeList,
-                        filterlangList,
+                        filterJobTypeList,
+                        filterLangList,
                         filterMinSalary,
                         filterMaxSalary
                     );
@@ -146,16 +163,21 @@ const getAPIPage = (apiPage, filterObj) => {
 
 getAPIPage(apiPage, filterObj);
 
-// recordsNumber = 0;
-
 const showDataInHtml = (apiData, filterObj) => {
     isEmpty = Object.keys(filterObj).length === 0;
 
     let parsedJobLocation;
 
     apiData.forEach(function (el) {
+        // convert specific location structure
+
+        if (el.options.job_location) {
+            parsedJobLocation = JSON.parse(el.options.job_location);
+            console.log(parsedJobLocation);
+        }
+
         if (isEmpty) {
-            // branches filter
+            // branches filter create (1 - create Array) ///////////////////////////////////////////////////////    1
 
             if (
                 filterBranchesList.findIndex(
@@ -165,7 +187,7 @@ const showDataInHtml = (apiData, filterObj) => {
                 filterBranchesList.push(el.options.branches);
             }
 
-            // job form filter
+            // job form filter create
             if (el.options._forma_zatrudnienia) {
                 el.options._forma_zatrudnienia.forEach(function (elem) {
                     if (
@@ -178,27 +200,25 @@ const showDataInHtml = (apiData, filterObj) => {
                 });
             }
 
-            // job type filter
+            // job type filter create
             if (
-                filterjobTypeList.findIndex(
+                filterJobTypeList.findIndex(
                     (arr_el) => arr_el === el.options.job_type
                 ) === -1
             ) {
-                filterjobTypeList.push(el.options.job_type);
+                filterJobTypeList.push(el.options.job_type);
             }
 
-            // lang filter
+            // lang filter create
             if (
-                filterlangList.findIndex(
+                filterLangList.findIndex(
                     (arr_el) => arr_el === el.advert.language
                 ) === -1
             ) {
-                filterlangList.push(el.advert.language);
+                filterLangList.push(el.advert.language);
             }
 
-            //
-
-            // salary filter
+            // salary filter create
             if (parseInt(el.options._Widoczna_stawka)) {
                 if (
                     parseInt(el.options._spodziewane_wynagrodzenie_od) <
@@ -214,8 +234,26 @@ const showDataInHtml = (apiData, filterObj) => {
                     filterMaxSalary = el.options._spodziewane_wynagrodzenie_do;
                 }
             }
+
+            // countries filter create
+            if (
+                filterCountriesList.findIndex(
+                    (arr_el) => arr_el === parsedJobLocation.country
+                ) === -1
+            ) {
+                filterCountriesList.push(parsedJobLocation.country);
+            }
+
+            // cities filter create
+            if (
+                filterCitiesList.findIndex(
+                    (arr_el) => arr_el === parsedJobLocation.locality
+                ) === -1
+            ) {
+                filterCitiesList.push(parsedJobLocation.locality);
+            }
         } else {
-            // activate branche filter
+            // branches filter apply (4 - download only selected data) /////////////////////////////////////////////////////  4
             if (filterObj.branchesFiltr.length) {
                 if (
                     filterObj.branchesFiltr.indexOf(el.options.branches) === -1
@@ -226,7 +264,7 @@ const showDataInHtml = (apiData, filterObj) => {
                 }
             }
 
-            // activate jobForm filter
+            // jobForm filter apply
             if (filterObj.jobFormsFiltr.length) {
                 let selectedJobFormsFiltr = false;
 
@@ -246,7 +284,7 @@ const showDataInHtml = (apiData, filterObj) => {
                 }
             }
 
-            // activate jobType filter
+            // jobType filter apply
             if (filterObj.jobTypesFiltr.length) {
                 if (
                     filterObj.jobTypesFiltr.indexOf(el.options.job_type) === -1
@@ -257,7 +295,7 @@ const showDataInHtml = (apiData, filterObj) => {
                 }
             }
 
-            // activate lang filter
+            // lang filter apply
             if (filterObj.langsFiltr.length) {
                 if (filterObj.langsFiltr.indexOf(el.advert.language) === -1) {
                     if (filterObj.langsFiltr.length) {
@@ -266,21 +304,21 @@ const showDataInHtml = (apiData, filterObj) => {
                 }
             }
 
-            // activate remote filter
+            // remote filter apply
             if (filterObj.remoteFiltr) {
                 if (!el.options.remote) {
                     return false;
                 }
             }
 
-            // activate relocation filter
+            // relocation filter apply
             if (filterObj.relocationFiltr) {
                 if (!el.options._relokacja) {
                     return false;
                 }
             }
 
-            // activate salary filter
+            // salary filter apply
             if (filterObj.salary[0] || filterObj.salary[1]) {
                 if (el.options._Widoczna_stawka == 1) {
                     if (
@@ -337,7 +375,7 @@ const showDataInHtml = (apiData, filterObj) => {
                 }
             }
 
-            // search text
+            // search text apply
             if (filterObj.searchText) {
                 let foundWord = false;
                 let position = -1;
@@ -361,24 +399,25 @@ const showDataInHtml = (apiData, filterObj) => {
                     return false;
                 }
             }
+
+            // countries filtr apply
+            if (filterObj.countriesFiltr.length) {
+                if (
+                    filterObj.countriesFiltr.indexOf(
+                        parsedJobLocation.country
+                    ) === -1
+                ) {
+                    if (parsedJobLocation.country) {
+                        return false;
+                    }
+                }
+            }
         }
 
-        // records
+        // records number counting
         recordsNumber++;
 
-        if (el.options.job_location) {
-            parsedJobLocation = JSON.parse(el.options.job_location);
-        }
-
-        let formaZatrudnienia = "";
-
-        if (el.options._forma_zatrudnienia) {
-            el.options._forma_zatrudnienia.forEach(function (elem) {
-                formaZatrudnienia = formaZatrudnienia + "<p>" + elem + "</p>";
-            });
-        }
-
-        // record Color
+        // colouring of records by type of recruitment
 
         let borderColorClass = "";
         let textColorClass = "";
@@ -394,6 +433,16 @@ const showDataInHtml = (apiData, filterObj) => {
         if (el.options._rekrutacja_rodzaj === "WEW") {
             borderColorClass = "wew-border";
             textColorClass = "wew-text";
+        }
+
+        // creating HTML code for record
+
+        let formaZatrudnienia = "";
+
+        if (el.options._forma_zatrudnienia) {
+            el.options._forma_zatrudnienia.forEach(function (elem) {
+                formaZatrudnienia = formaZatrudnienia + "<p>" + elem + "</p>";
+            });
         }
 
         resultsLoc.insertAdjacentHTML(
@@ -462,74 +511,125 @@ const showDataInHtml = (apiData, filterObj) => {
         );
     });
 
+    // download next 100 rekords from API
     getAPIPage(++apiPage, filterObj);
 };
 
-const filterHTML = (
-    filterBranchesList,
-    filterJobFormList,
-    filterjobTypeList,
-    filterlangList,
-    filterMinSalary,
-    filterMaxSalary
-) => {
-    if (filterBranchesList.length > 0) {
-        filterBranchesList.sort();
-        rowHeight = filterBranchesList.length * 21 + 3;
-        filterListMaxHeight = rowHeight;
-        branchesLoc.style.height = String(rowHeight) + "px";
-        filterBranchesList.forEach(function (el) {
-            branchesLoc.insertAdjacentHTML(
-                "beforeend",
-                `<option value="${el}">${el}</option>`
-            );
-        });
-    }
+// fullfill filters lists
+const filterHTML = () =>
+    // filterBranchesList,
+    // filterJobFormList,
+    // filterJobTypeList,
+    // filterLangList,
+    // filterMinSalary,
+    // filterMaxSalary
+    {
+        // fullfill branches filters list (2 - fullfill lists in HTML) ///////////////////////////////////////////////////////   2
+        if (filterBranchesList.length > 0) {
+            filterBranchesList.sort(function (a, b) {
+                return a.localeCompare(b);
+            });
+            rowHeight = filterBranchesList.length * 21 + 3;
+            filterListMaxHeight = rowHeight;
+            branchesLoc.style.height = String(rowHeight) + "px";
+            filterBranchesList.forEach(function (el) {
+                branchesLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<option value="${el}">${el}</option>`
+                );
+            });
+        }
+        // fullfill jobforms filters list
+        if (filterJobFormList.length > 0) {
+            filterJobFormList.sort(function (a, b) {
+                return a.localeCompare(b);
+            });
+            rowHeight = filterJobFormList.length * 21 + 3;
+            jobFormLoc.style.height = String(rowHeight) + "px";
+            filterJobFormList.forEach(function (el) {
+                jobFormLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<option value="${el}">${el}</option>`
+                );
+            });
+        }
+        // fullfill jobtypes filters list
+        if (filterJobTypeList.length > 0) {
+            filterJobTypeList.sort(function (a, b) {
+                return a.localeCompare(b);
+            });
+            rowHeight = filterJobTypeList.length * 21 + 3;
+            jobTypeLoc.style.height = String(rowHeight) + "px";
+            filterJobTypeList.forEach(function (el) {
+                jobTypeLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<option value="${el}">${el}</option>`
+                );
+            });
+        }
+        // fullfill langs filters list
+        if (filterLangList.length > 0) {
+            filterLangList.sort(function (a, b) {
+                return a.localeCompare(b);
+            });
+            rowHeight = filterLangList.length * 21 + 3;
+            langLoc.style.height = String(rowHeight) + "px";
+            filterLangList.forEach(function (el) {
+                langLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<option value="${el}">${el}</option>`
+                );
+            });
+        }
+        // fullfill countries filters list
+        if (filterCountriesList.length > 0) {
+            filterCountriesList.sort(function (a, b) {
+                return a.localeCompare(b);
+            });
+            filterCountriesList.forEach(function (el) {
+                if (countriesLoc.length === 0) {
+                    countriesLoc.insertAdjacentHTML(
+                        "beforeend",
+                        `<option value="">Państwo</option><option value="${el}">${el}</option>`
+                    );
+                } else {
+                    countriesLoc.insertAdjacentHTML(
+                        "beforeend",
+                        `<option value="${el}">${el}</option>`
+                    );
+                }
+            });
+        }
 
-    if (filterJobFormList.length > 0) {
-        filterJobFormList.sort();
-        rowHeight = filterJobFormList.length * 21 + 3;
-        jobFormLoc.style.height = String(rowHeight) + "px";
-        filterJobFormList.forEach(function (el) {
-            jobFormLoc.insertAdjacentHTML(
-                "beforeend",
-                `<option value="${el}">${el}</option>`
-            );
-        });
-    }
+        // fullfill cities filters list
+        if (filterCitiesList.length > 0) {
+            filterCitiesList.sort(function (a, b) {
+                return a.localeCompare(b);
+            });
+            filterCitiesList.forEach(function (el) {
+                if (citiesLoc.length === 0) {
+                    citiesLoc.insertAdjacentHTML(
+                        "beforeend",
+                        `<option value="">Miasto</option><option value="${el}">${el}</option>`
+                    );
+                } else {
+                    citiesLoc.insertAdjacentHTML(
+                        "beforeend",
+                        `<option value="${el}">${el}</option>`
+                    );
+                }
+            });
+        }
 
-    if (filterjobTypeList.length > 0) {
-        filterjobTypeList.sort();
-        rowHeight = filterjobTypeList.length * 21 + 3;
-        jobTypeLoc.style.height = String(rowHeight) + "px";
-        filterjobTypeList.forEach(function (el) {
-            jobTypeLoc.insertAdjacentHTML(
-                "beforeend",
-                `<option value="${el}">${el}</option>`
-            );
-        });
-    }
-
-    if (filterlangList.length > 0) {
-        filterlangList.sort();
-        rowHeight = filterlangList.length * 21 + 3;
-        langLoc.style.height = String(rowHeight) + "px";
-        filterlangList.forEach(function (el) {
-            langLoc.insertAdjacentHTML(
-                "beforeend",
-                `<option value="${el}">${el}</option>`
-            );
-        });
-    }
-    sliderOne.value = filterMinSalary;
-    sliderTwo.value = filterMaxSalary;
-    sliderOne.min = filterMinSalary;
-    sliderTwo.min = filterMinSalary;
-    sliderOne.max = filterMaxSalary;
-    sliderTwo.max = filterMaxSalary;
-    slideOne();
-    slideTwo();
-};
+        sliderOne.value = filterMinSalary;
+        sliderTwo.value = filterMaxSalary;
+        sliderOne.min = filterMinSalary;
+        sliderTwo.min = filterMinSalary;
+        sliderOne.max = filterMaxSalary;
+        sliderTwo.max = filterMaxSalary;
+        slideOne();
+        slideTwo();
+    };
 
 // double range slider
 
@@ -569,8 +669,9 @@ const getFilteredData = () => {
     const jobFormChildrenLoc = document.querySelectorAll(".job-form option");
     const jobTypeChildrenLoc = document.querySelectorAll(".job-type option");
     const langChildrenLoc = document.querySelectorAll(".lang option");
+    const countriesChildrenLoc = document.querySelectorAll(".countries option");
 
-    // create filter Obj
+    // create filter Object (3 - put selected options to Object) ///////////////////////////////////////////////////////   3
 
     filterObj = {};
 
@@ -606,6 +707,17 @@ const getFilteredData = () => {
             return elem.value;
         });
 
+    let selectedCountry = [];
+    if (locationMarkLoc.checked) {
+        selectedCountry = Array.from(countriesChildrenLoc)
+            .filter(function (elem) {
+                return elem.selected;
+            })
+            .map(function (elem) {
+                return elem.value;
+            });
+    }
+
     let selectedRemote = remoteLoc.checked;
     let selectedRelocation = relocationLoc.checked;
 
@@ -627,6 +739,7 @@ const getFilteredData = () => {
     filterObj.relocationFiltr = selectedRelocation;
     filterObj.salary = [selectedValOne, selectedValTwo];
     filterObj.searchText = searchInputLoc.value;
+    filterObj.countriesFiltr = selectedCountry;
 
     // reset initialvalue
     apiPage = 1;
@@ -657,7 +770,7 @@ clearFilterLoc.forEach((elemFiltr) => {
     });
 });
 
-dropDownBtnLoc.addEventListener("click", () => {
+dropDownLoc.addEventListener("click", () => {
     dropDownBtnLoc.classList.toggle("up");
     if (dropDownFilterLoc.classList.contains("show")) {
         dropDownFilterLoc.classList.remove("show");
@@ -671,4 +784,35 @@ dropDownBtnLoc.addEventListener("click", () => {
         moreFiltersLoc.classList.add("hide");
         lessFiltersLoc.classList.add("show");
     }
+});
+
+locationMarkLoc.checked = false;
+locationDotLoc.disabled = true;
+countriesLoc.disabled = true;
+citiesLoc.disabled = true;
+
+locationMarkLoc.addEventListener("change", function (e) {
+    if (e.target.checked) {
+        locationSliderLoc.classList.remove("unactive");
+        locationValuesLoc.classList.remove("unactive");
+        locationDotLoc.disabled = false;
+        countriesLoc.disabled = false;
+        citiesLoc.disabled = false;
+    } else {
+        locationSliderLoc.classList.add("unactive");
+        locationValuesLoc.classList.add("unactive");
+        locationDotLoc.disabled = true;
+        countriesLoc.disabled = true;
+        citiesLoc.disabled = true;
+    }
+});
+
+function slideThree() {
+    displayValThree.textContent = locationDotLoc.value;
+}
+
+locationDotLoc.value = 0;
+
+countriesLoc.addEventListener("change", function (e) {
+    console.log(countriesLoc.value);
 });
