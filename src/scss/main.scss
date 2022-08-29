@@ -10,6 +10,7 @@ $color-rec-2: #6bc424;
 $color-rec-3: #fe7320;
 $dangerColor: #fe7320;
 $unactiveColor: #D3D3D3;
+$lightColor: #c5c3c3;
 
 * {
     margin: 0;
@@ -63,6 +64,8 @@ main {
     opacity: 0.3;
     filter: grayscale(100%);
 }
+
+
 
 .checkbox-container {
     margin: 10px;
@@ -229,12 +232,21 @@ main {
                         color: $font-color;
                         padding: 5px 0;
                         border-radius: 3px;
-                        border: 1px solid $primary-color
+                        border: 1px solid $primary-color;
+                        option.placeholder {
+                            color: $unactiveColor
+                        }
                     }
                     select:disabled {
                         border: 1px solid $unactiveColor;
                         color: $unactiveColor;
-                        font-weight: 300;
+                    }
+                    select.cities option {
+                        color: $lightColor;
+                    }
+
+                    select.cities option.active {
+                        color: $font-color;
                     }
                 }
                 .distance-slider {

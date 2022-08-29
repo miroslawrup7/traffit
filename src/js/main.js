@@ -57,8 +57,7 @@ let filterJobTypeList = [];
 let filterLangList = [];
 let filterMinSalary = 100000;
 let filterMaxSalary = 0;
-let filterCountriesList = [];
-let filterCitiesList = [];
+let filterCountriesList = {};
 
 let recordsNumber = 0;
 
@@ -157,6 +156,12 @@ const getAPIPage = (apiPage, filterObj) => {
                 } else {
                     noResultsLoc.classList.remove("active");
                 }
+
+                for (let key in filterCountriesList) {
+                    filterCountriesList[key].sort(function (a, b) {
+                        return a.localeCompare(b);
+                    });
+                }
             }
         });
 };
@@ -173,7 +178,6 @@ const showDataInHtml = (apiData, filterObj) => {
 
         if (el.options.job_location) {
             parsedJobLocation = JSON.parse(el.options.job_location);
-            console.log(parsedJobLocation);
         }
 
         if (isEmpty) {
@@ -235,22 +239,23 @@ const showDataInHtml = (apiData, filterObj) => {
                 }
             }
 
-            // countries filter create
-            if (
-                filterCountriesList.findIndex(
-                    (arr_el) => arr_el === parsedJobLocation.country
-                ) === -1
-            ) {
-                filterCountriesList.push(parsedJobLocation.country);
-            }
+            // countries & cities create
 
-            // cities filter create
-            if (
-                filterCitiesList.findIndex(
-                    (arr_el) => arr_el === parsedJobLocation.locality
-                ) === -1
-            ) {
-                filterCitiesList.push(parsedJobLocation.locality);
+            if (filterCountriesList[parsedJobLocation.country]) {
+                if (
+                    filterCountriesList[parsedJobLocation.country].findIndex(
+                        (arr_el) => arr_el === parsedJobLocation.locality
+                    ) === -1
+                ) {
+                    filterCountriesList[parsedJobLocation.country].push(
+                        parsedJobLocation.locality
+                    );
+                }
+            } else {
+                filterCountriesList[parsedJobLocation.country] = [];
+                filterCountriesList[parsedJobLocation.country].push(
+                    parsedJobLocation.locality
+                );
             }
         } else {
             // branches filter apply (4 - download only selected data) /////////////////////////////////////////////////////  4
@@ -582,44 +587,46 @@ const filterHTML = () =>
             });
         }
         // fullfill countries filters list
-        if (filterCountriesList.length > 0) {
-            filterCountriesList.sort(function (a, b) {
+        if (Object.keys(filterCountriesList).length > 0) {
+            // sort keys (countries) in object
+            const filterCountriesListSorted = Object.keys(filterCountriesList)
+                .sort()
+                .reduce((accumulator, key) => {
+                    accumulator[key] = filterCountriesList[key];
+                    return accumulator;
+                }, {});
+
+            countriesLoc.insertAdjacentHTML(
+                "beforeend",
+                `<option value="" class="placeholder">Państwo</option>`
+            );
+            let newAllCitiesArray = [];
+            for (let klucz in filterCountriesListSorted) {
+                countriesLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<option value="${klucz}">${klucz}</option>`
+                );
+                newAllCitiesArray = newAllCitiesArray.concat(
+                    filterCountriesListSorted[klucz]
+                );
+            }
+
+            newAllCitiesArray.sort(function (a, b) {
                 return a.localeCompare(b);
             });
-            filterCountriesList.forEach(function (el) {
-                if (countriesLoc.length === 0) {
-                    countriesLoc.insertAdjacentHTML(
-                        "beforeend",
-                        `<option value="">Państwo</option><option value="${el}">${el}</option>`
-                    );
-                } else {
-                    countriesLoc.insertAdjacentHTML(
-                        "beforeend",
-                        `<option value="${el}">${el}</option>`
-                    );
-                }
+            citiesLoc.insertAdjacentHTML(
+                "beforeend",
+                `<option value="" class="placeholder">Miasto</option>`
+            );
+            newAllCitiesArray.forEach(function (el) {
+                citiesLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<option value="${el}" class="active">${el} </option>`
+                );
             });
         }
 
-        // fullfill cities filters list
-        if (filterCitiesList.length > 0) {
-            filterCitiesList.sort(function (a, b) {
-                return a.localeCompare(b);
-            });
-            filterCitiesList.forEach(function (el) {
-                if (citiesLoc.length === 0) {
-                    citiesLoc.insertAdjacentHTML(
-                        "beforeend",
-                        `<option value="">Miasto</option><option value="${el}">${el}</option>`
-                    );
-                } else {
-                    citiesLoc.insertAdjacentHTML(
-                        "beforeend",
-                        `<option value="${el}">${el}</option>`
-                    );
-                }
-            });
-        }
+        Object.keys(filterObj).length === 0;
 
         sliderOne.value = filterMinSalary;
         sliderTwo.value = filterMaxSalary;
@@ -813,6 +820,20 @@ function slideThree() {
 
 locationDotLoc.value = 0;
 
-countriesLoc.addEventListener("change", function (e) {
-    console.log(countriesLoc.value);
+countriesLoc.addEventListener("change", function () {
+    citiesLoc.querySelectorAll("option").forEach((el) => {
+        if (countriesLoc.value) {
+            if (
+                filterCountriesList[countriesLoc.value].findIndex(
+                    (sel_el) => sel_el === el.value
+                ) !== -1
+            ) {
+                el.classList.add("active");
+            } else {
+                el.classList.remove("active");
+            }
+        } else {
+            el.classList.add("active");
+        }
+    });
 });
