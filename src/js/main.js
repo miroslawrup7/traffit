@@ -135,7 +135,7 @@ const getAPIPage = (apiPage, filterObj) => {
             if (apiDataLength > 0) {
                 if (apiPage === 1) {
                     resultsLoc.replaceChildren();
-                    recordsNumber = 0;
+                    recordsNumber = 0; // ???
                 }
 
                 showDataInHtml(fetchObj.apiArray, filterObj);
@@ -157,10 +157,12 @@ const getAPIPage = (apiPage, filterObj) => {
                     noResultsLoc.classList.remove("active");
                 }
 
+                function compare(a, b) {
+                    return a.city.localeCompare(b.city);
+                }
+
                 for (let key in filterCountriesList) {
-                    filterCountriesList[key].sort(function (a, b) {
-                        return a.localeCompare(b);
-                    });
+                    filterCountriesList[key].sort(compare);
                 }
             }
         });
@@ -240,22 +242,25 @@ const showDataInHtml = (apiData, filterObj) => {
             }
 
             // countries & cities create
-
             if (filterCountriesList[parsedJobLocation.country]) {
                 if (
                     filterCountriesList[parsedJobLocation.country].findIndex(
-                        (arr_el) => arr_el === parsedJobLocation.locality
+                        (arr_el) => arr_el.city === parsedJobLocation.locality
                     ) === -1
                 ) {
-                    filterCountriesList[parsedJobLocation.country].push(
-                        parsedJobLocation.locality
-                    );
+                    filterCountriesList[parsedJobLocation.country].push({
+                        city: parsedJobLocation.locality,
+                        lati: parseFloat(parsedJobLocation.latitude),
+                        longi: parseFloat(parsedJobLocation.longitude),
+                    });
                 }
             } else {
                 filterCountriesList[parsedJobLocation.country] = [];
-                filterCountriesList[parsedJobLocation.country].push(
-                    parsedJobLocation.locality
-                );
+                filterCountriesList[parsedJobLocation.country].push({
+                    city: parsedJobLocation.locality,
+                    lati: parseFloat(parsedJobLocation.latitude),
+                    longi: parseFloat(parsedJobLocation.longitude),
+                });
             }
         } else {
             // branches filter apply (4 - download only selected data) /////////////////////////////////////////////////////  4
@@ -406,7 +411,7 @@ const showDataInHtml = (apiData, filterObj) => {
             }
 
             // countries filtr apply
-            if (filterObj.countriesFiltr.length) {
+            if (filterObj.countriesFiltr[0]) {
                 if (
                     filterObj.countriesFiltr.indexOf(
                         parsedJobLocation.country
@@ -414,6 +419,49 @@ const showDataInHtml = (apiData, filterObj) => {
                 ) {
                     if (parsedJobLocation.country) {
                         return false;
+                    }
+                }
+            }
+
+            // cities filtr apply
+            if (filterObj.citiesFiltr[0]) {
+                if (
+                    filterObj.citiesFiltr.indexOf(
+                        parsedJobLocation.locality
+                    ) === -1
+                ) {
+                    if (parsedJobLocation.locality) {
+                        // distance filtr apply
+                        // if (filterObj.distanceFiltr) {
+                        if (citiesLoc.value) {
+                            let lati = parseFloat(parsedJobLocation.latitude);
+                            let longi = parseFloat(parsedJobLocation.longitude);
+                            let km = filterObj.distanceFiltr;
+
+                            let min_lati = filterObj.latiFiltr - km * 0.009044;
+                            let max_lati = filterObj.latiFiltr + km * 0.009044;
+                            let min_longi =
+                                filterObj.longiFiltr -
+                                (km * 0.0089831) /
+                                    Math.cos(
+                                        (filterObj.latiFiltr * Math.PI) / 180
+                                    );
+                            let max_longi =
+                                filterObj.longiFiltr +
+                                (km * 0.0089831) /
+                                    Math.cos(
+                                        (filterObj.latiFiltr * Math.PI) / 180
+                                    );
+                            if (
+                                lati > max_lati ||
+                                lati < min_lati ||
+                                longi > max_longi ||
+                                longi < min_longi
+                            ) {
+                                return false;
+                            }
+                        }
+                        // }
                     }
                 }
             }
@@ -516,7 +564,7 @@ const showDataInHtml = (apiData, filterObj) => {
         );
     });
 
-    // download next 100 rekords from API
+    // download next 100 records from API
     getAPIPage(++apiPage, filterObj);
 };
 
@@ -595,29 +643,37 @@ const filterHTML = () =>
                     accumulator[key] = filterCountriesList[key];
                     return accumulator;
                 }, {});
-
             countriesLoc.insertAdjacentHTML(
                 "beforeend",
                 `<option value="" class="placeholder">Państwo</option>`
             );
-            let newAllCitiesArray = [];
+
+            let newAllCitiesObj = [];
             for (let klucz in filterCountriesListSorted) {
                 countriesLoc.insertAdjacentHTML(
                     "beforeend",
                     `<option value="${klucz}">${klucz}</option>`
                 );
-                newAllCitiesArray = newAllCitiesArray.concat(
+
+                newAllCitiesObj = newAllCitiesObj.concat(
                     filterCountriesListSorted[klucz]
                 );
             }
 
+            let newAllCitiesArray = [];
+            newAllCitiesObj.forEach((el) => {
+                newAllCitiesArray.push(el.city);
+            });
+
             newAllCitiesArray.sort(function (a, b) {
                 return a.localeCompare(b);
             });
+
             citiesLoc.insertAdjacentHTML(
                 "beforeend",
                 `<option value="" class="placeholder">Miasto</option>`
             );
+
             newAllCitiesArray.forEach(function (el) {
                 citiesLoc.insertAdjacentHTML(
                     "beforeend",
@@ -677,6 +733,7 @@ const getFilteredData = () => {
     const jobTypeChildrenLoc = document.querySelectorAll(".job-type option");
     const langChildrenLoc = document.querySelectorAll(".lang option");
     const countriesChildrenLoc = document.querySelectorAll(".countries option");
+    const citiesChildrenLoc = document.querySelectorAll(".cities option");
 
     // create filter Object (3 - put selected options to Object) ///////////////////////////////////////////////////////   3
 
@@ -725,6 +782,34 @@ const getFilteredData = () => {
             });
     }
 
+    let selectedCity = [];
+    if (locationMarkLoc.checked) {
+        selectedCity = Array.from(citiesChildrenLoc)
+            .filter(function (elem) {
+                return elem.selected;
+            })
+            .map(function (elem) {
+                return elem.value;
+            });
+    }
+
+    let selectedLati;
+    let selectedLongi;
+    if (selectedCity[0]) {
+        selectedLati = filterCountriesList[selectedCountry[0]].find(
+            (el) => el.city === selectedCity[0]
+        ).lati;
+
+        selectedLongi = filterCountriesList[selectedCountry[0]].find(
+            (el) => el.city === selectedCity[0]
+        ).longi;
+    }
+
+    let selectedDistance = 0;
+    if (locationMarkLoc.checked) {
+        selectedDistance = parseInt(locationDotLoc.value);
+    }
+
     let selectedRemote = remoteLoc.checked;
     let selectedRelocation = relocationLoc.checked;
 
@@ -733,9 +818,6 @@ const getFilteredData = () => {
     if (salaryMarkLoc.checked) {
         selectedValOne = displayValOne.innerText;
         selectedValTwo = displayValTwo.innerText;
-    }
-
-    if (searchInputLoc.value !== "") {
     }
 
     filterObj.branchesFiltr = selectedBranches;
@@ -747,12 +829,15 @@ const getFilteredData = () => {
     filterObj.salary = [selectedValOne, selectedValTwo];
     filterObj.searchText = searchInputLoc.value;
     filterObj.countriesFiltr = selectedCountry;
+    filterObj.citiesFiltr = selectedCity;
+    filterObj.distanceFiltr = selectedDistance;
+    filterObj.latiFiltr = selectedLati;
+    filterObj.longiFiltr = selectedLongi;
 
     // reset initialvalue
     apiPage = 1;
     apiDataLength = 0;
     recordsNumber = 0;
-
     getAPIPage(apiPage, filterObj);
 };
 
@@ -800,15 +885,19 @@ citiesLoc.disabled = true;
 
 locationMarkLoc.addEventListener("change", function (e) {
     if (e.target.checked) {
-        locationSliderLoc.classList.remove("unactive");
-        locationValuesLoc.classList.remove("unactive");
-        locationDotLoc.disabled = false;
+        if (citiesLoc.value) {
+            locationSliderLoc.classList.remove("unactive");
+            locationValuesLoc.classList.remove("unactive");
+            locationDotLoc.disabled = false;
+        }
+
         countriesLoc.disabled = false;
         citiesLoc.disabled = false;
     } else {
         locationSliderLoc.classList.add("unactive");
         locationValuesLoc.classList.add("unactive");
         locationDotLoc.disabled = true;
+
         countriesLoc.disabled = true;
         citiesLoc.disabled = true;
     }
@@ -820,12 +909,12 @@ function slideThree() {
 
 locationDotLoc.value = 0;
 
-countriesLoc.addEventListener("change", function () {
+const activateCities = () => {
     citiesLoc.querySelectorAll("option").forEach((el) => {
         if (countriesLoc.value) {
             if (
                 filterCountriesList[countriesLoc.value].findIndex(
-                    (sel_el) => sel_el === el.value
+                    (sel_el) => sel_el.city === el.value
                 ) !== -1
             ) {
                 el.classList.add("active");
@@ -836,4 +925,50 @@ countriesLoc.addEventListener("change", function () {
             el.classList.add("active");
         }
     });
+};
+
+countriesLoc.addEventListener("change", function () {
+    activateCities();
+
+    if (countriesLoc.value) {
+        if (
+            filterCountriesList[countriesLoc.value].find(
+                (el) => el.city !== citiesLoc.value
+            )
+        ) {
+            citiesLoc.value = filterCountriesList[countriesLoc.value][0].city;
+            locationSliderLoc.classList.remove("unactive");
+            locationValuesLoc.classList.remove("unactive");
+            locationDotLoc.disabled = false;
+        }
+    } else {
+        citiesLoc.value = citiesLoc[0].value;
+        locationSliderLoc.classList.add("unactive");
+        locationValuesLoc.classList.add("unactive");
+        locationDotLoc.disabled = true;
+    }
+});
+
+citiesLoc.addEventListener("change", function () {
+    Object.keys(filterCountriesList).find((key) => {
+        if (
+            filterCountriesList[key].findIndex(
+                (sel_el) => sel_el.city === citiesLoc.value
+            ) !== -1
+        ) {
+            if (countriesLoc.value !== key) {
+                countriesLoc.value = key;
+                activateCities();
+            }
+        }
+    });
+    if (!citiesLoc.value) {
+        locationSliderLoc.classList.add("unactive");
+        locationValuesLoc.classList.add("unactive");
+        locationDotLoc.disabled = true;
+    } else {
+        locationSliderLoc.classList.remove("unactive");
+        locationValuesLoc.classList.remove("unactive");
+        locationDotLoc.disabled = false;
+    }
 });
