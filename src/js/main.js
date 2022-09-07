@@ -48,6 +48,11 @@ const searchInputLoc = document.querySelector(".search-input input");
 
 const searchBtn = document.querySelector(".search-btn");
 
+const recordsOnPageLoc = document.querySelectorAll(".recordsOnPage span");
+
+const pagesContainerLoc = document.querySelector(".pages-container");
+let pageButtonsLoc = document.querySelectorAll(".page");
+
 let apiPage = 1;
 let rawAPIArray = [];
 let allRecordsArray = [];
