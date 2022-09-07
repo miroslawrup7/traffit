@@ -104,14 +104,19 @@ main {
             border: 1px $primary-color solid;
             border-radius: 3px;
         }
-        /* On mouse-over, add a grey background color */
+        /* On mouse-over, add a background color */
         &:hover input ~ .checkmark {
             background-color: $primary-color-light;
         }
-        /* When the checkbox is checked, add a blue background */
+        /* When the checkbox is checked, add a background */
         input:checked ~ .checkmark {
             background-color: $primary-color;
             border: 1px $primary-color solid;
+        }
+        /* When the checkbox is checked, add a background */
+        input:checked:hover ~ .checkmark {
+            background-color: $contrastColor;
+            border: 1px $contrastColor solid;
         }
         /* Create the checkmark/indicator (hidden when not checked) */
         .checkmark:after {
@@ -238,7 +243,6 @@ main {
         }
         .loc-and-checkboxes {
             display: flex;
-            margin-bottom: 30px;
             .loc-container {
                 display: flex;
                 flex-grow: 1;
@@ -300,11 +304,24 @@ main {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                position: relative;
                 label {
                     margin-bottom: 5px;
                     border-bottom: 2px solid $primary-color;
                     width: 100%;
                     text-align: center;
+                    padding: 0 25px;
+                }
+                img {
+                    height: 15px;
+                    position: absolute;
+                    right: 5px;
+                    top: 4px;
+                    opacity: 0.4;
+                    &:hover {
+                        opacity: 1;
+                        cursor: pointer;
+                    }
                 }
                 select {
                     margin: 0 10px 10px 10px;
@@ -353,6 +370,13 @@ main {
         flex-direction: column;
         font-size: 11px;
         font-weight: 500;
+        opacity: 0;
+        transition: opacity 2s;
+
+
+        &.active {
+            opacity: 1;
+        }
         
         img {
             transition: all 0.8s;

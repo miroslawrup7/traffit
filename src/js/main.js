@@ -48,10 +48,10 @@ const searchInputLoc = document.querySelector(".search-input input");
 
 const searchBtn = document.querySelector(".search-btn");
 
-const recordsOnPageLoc = document.querySelectorAll(".recordsOnPage span");
-
 const pagesContainerLoc = document.querySelector(".pages-container");
-let pageButtonsLoc = document.querySelectorAll(".page");
+
+const clearFiltersLoc = document.querySelector(".clear-filters");
+const clearFilterLoc = document.querySelectorAll(".lists .list .clear-list");
 
 let apiPage = 1;
 let rawAPIArray = [];
@@ -103,7 +103,7 @@ const createDataForFilters = (
     lati,
     longi
 ) => {
-    if (filterBranchesList.indexOf(branche) === -1) {
+    if (filterBranchesList.indexOf(branche) === -1 && branche !== undefined) {
         filterBranchesList.push(branche);
     }
     if (jobForm) {
@@ -113,7 +113,7 @@ const createDataForFilters = (
             }
         });
     }
-    if (filterJobTypeList.indexOf(jobType) === -1) {
+    if (filterJobTypeList.indexOf(jobType) === -1 && jobType !== undefined) {
         filterJobTypeList.push(jobType);
     }
     if (filterLangList.indexOf(lang) === -1) {
@@ -201,6 +201,28 @@ const summariseDownload = (recordsNumber) => {
     } else {
         noResultsLoc.classList.remove("active");
     }
+};
+
+// show & hide MORE FILTERS //////////////////////////////////////////////////
+
+const dropDownBtnStart = () => {
+    dropDownLoc.addEventListener("click", () => {
+        dropDownBtnLoc.classList.toggle("up");
+        if (dropDownFilterLoc.classList.contains("show")) {
+            dropDownFilterLoc.classList.remove("show");
+            dropDownFilterLoc.style.maxHeight = String(0) + "px";
+            moreFiltersLoc.classList.remove("hide");
+            lessFiltersLoc.classList.remove("show");
+        } else {
+            dropDownFilterLoc.classList.add("show");
+            dropDownFilterLoc.style.maxHeight =
+                String(filterListMaxHeight + 200) + "px";
+            moreFiltersLoc.classList.add("hide");
+            lessFiltersLoc.classList.add("show");
+        }
+    });
+
+    dropDownLoc.classList.add("active");
 };
 
 // create RECORDS BOXES ///////////////////////////////////////////////
@@ -338,6 +360,7 @@ const loopOnAPI = (jsonData) => {
         createRecordBoxes(allRecordsArray, firstRecordNumber, recordsOnPage);
         setPages(recordsNumber);
         createFilterLists();
+        dropDownBtnStart();
     }
 };
 
@@ -483,8 +506,6 @@ const createFilteredRecordsArray = () => {
 
     let filteredRecordsArray = allRecordsArray;
 
-    console.log(allRecordsArray);
-
     // selectedBranches ////////////////
 
     let selectedBranches = Array.from(branchesChildrenLoc)
@@ -494,8 +515,6 @@ const createFilteredRecordsArray = () => {
         .map(function (elem) {
             return elem.value;
         });
-
-    console.log(selectedBranches);
 
     let filteredRecordsArray_1 = [];
 
@@ -510,15 +529,12 @@ const createFilteredRecordsArray = () => {
             });
 
             if (addFlag) {
-                console.log(index);
                 filteredRecordsArray_1.push(el);
             }
         });
     } else {
         filteredRecordsArray_1 = filteredRecordsArray;
     }
-
-    console.log(filteredRecordsArray_1);
 
     // selectedJobForms ////////////////
 
@@ -529,8 +545,6 @@ const createFilteredRecordsArray = () => {
         .map(function (elem) {
             return elem.value;
         });
-
-    console.log(selectedJobForms);
 
     let filteredRecordsArray_2 = [];
 
@@ -546,7 +560,6 @@ const createFilteredRecordsArray = () => {
                 });
 
                 if (addFlag) {
-                    console.log(index);
                     filteredRecordsArray_2.push(el);
                 }
             }
@@ -554,8 +567,6 @@ const createFilteredRecordsArray = () => {
     } else {
         filteredRecordsArray_2 = filteredRecordsArray_1;
     }
-
-    console.log(filteredRecordsArray_2);
 
     // selectedJobTypes////////////////
 
@@ -566,8 +577,6 @@ const createFilteredRecordsArray = () => {
         .map(function (elem) {
             return elem.value;
         });
-
-    console.log(selectedjobTypes);
 
     let filteredRecordsArray_3 = [];
 
@@ -582,15 +591,12 @@ const createFilteredRecordsArray = () => {
             });
 
             if (addFlag) {
-                console.log(index);
                 filteredRecordsArray_3.push(el);
             }
         });
     } else {
         filteredRecordsArray_3 = filteredRecordsArray_2;
     }
-
-    console.log(filteredRecordsArray_3);
 
     // selectedLangs ////////////////
 
@@ -601,8 +607,6 @@ const createFilteredRecordsArray = () => {
         .map(function (elem) {
             return elem.value;
         });
-
-    console.log(selectedLangs);
 
     let filteredRecordsArray_4 = [];
 
@@ -617,15 +621,12 @@ const createFilteredRecordsArray = () => {
             });
 
             if (addFlag) {
-                console.log(index);
                 filteredRecordsArray_4.push(el);
             }
         });
     } else {
         filteredRecordsArray_4 = filteredRecordsArray_3;
     }
-
-    console.log(filteredRecordsArray_4);
 
     // selectedSalary ////////////////
 
@@ -635,8 +636,6 @@ const createFilteredRecordsArray = () => {
         selectedValOne = parseInt(displayValOne.innerText);
         selectedValTwo = parseInt(displayValTwo.innerText);
     }
-    console.log(selectedValOne);
-    console.log(selectedValTwo);
 
     let filteredRecordsArray_5 = [];
 
@@ -666,15 +665,12 @@ const createFilteredRecordsArray = () => {
             }
 
             if (addFlag) {
-                console.log(index);
                 filteredRecordsArray_5.push(el);
             }
         });
     } else {
         filteredRecordsArray_5 = filteredRecordsArray_4;
     }
-
-    console.log(filteredRecordsArray_5);
 
     // selectedCountry ////////////////
 
@@ -694,8 +690,6 @@ const createFilteredRecordsArray = () => {
             });
     }
 
-    console.log(selectedCountry);
-
     let filteredRecordsArray_6 = [];
 
     if (locationMarkLoc.checked) {
@@ -710,7 +704,6 @@ const createFilteredRecordsArray = () => {
                 });
 
                 if (addFlag) {
-                    console.log(index);
                     filteredRecordsArray_6.push(el);
                 }
             });
@@ -720,8 +713,6 @@ const createFilteredRecordsArray = () => {
     } else {
         filteredRecordsArray_6 = filteredRecordsArray_5;
     }
-
-    console.log(filteredRecordsArray_6);
 
     // selectedCity & selectedDistance ////////////////
 
@@ -741,8 +732,6 @@ const createFilteredRecordsArray = () => {
             });
     }
 
-    console.log(selectedCity);
-
     let filteredRecordsArray_7 = [];
 
     if (locationMarkLoc.checked) {
@@ -750,8 +739,6 @@ const createFilteredRecordsArray = () => {
             let selectedDistance = 0;
 
             selectedDistance = parseInt(locationDotLoc.value);
-
-            console.log(selectedDistance);
 
             let lati;
             let longi;
@@ -764,9 +751,6 @@ const createFilteredRecordsArray = () => {
                 if (el.city === selectedCity[0]) {
                     lati = el.lati;
                     longi = el.longi;
-                    console.log(index);
-                    console.log(lati);
-                    console.log(longi);
 
                     min_lati = lati - selectedDistance * 0.009044;
                     max_lati = lati + selectedDistance * 0.009044;
@@ -778,10 +762,6 @@ const createFilteredRecordsArray = () => {
                         longi +
                         (selectedDistance * 0.0089831) /
                             Math.cos((lati * Math.PI) / 180);
-                    console.log(min_lati);
-                    console.log(max_lati);
-                    console.log(min_longi);
-                    console.log(max_longi);
                 }
             });
 
@@ -798,7 +778,6 @@ const createFilteredRecordsArray = () => {
                 }
 
                 if (addFlag) {
-                    console.log(index);
                     filteredRecordsArray_7.push(el);
                 }
             });
@@ -808,8 +787,6 @@ const createFilteredRecordsArray = () => {
     } else {
         filteredRecordsArray_7 = filteredRecordsArray_6;
     }
-
-    console.log(filteredRecordsArray_7);
 
     // selectedRemote ////////////////
 
@@ -824,15 +801,12 @@ const createFilteredRecordsArray = () => {
             }
 
             if (addFlag) {
-                console.log(index);
                 filteredRecordsArray_8.push(el);
             }
         });
     } else {
         filteredRecordsArray_8 = filteredRecordsArray_7;
     }
-
-    console.log(filteredRecordsArray_8);
 
     // selectedRelocation ////////////////
 
@@ -847,15 +821,12 @@ const createFilteredRecordsArray = () => {
             }
 
             if (addFlag) {
-                console.log(index);
                 filteredRecordsArray_9.push(el);
             }
         });
     } else {
         filteredRecordsArray_9 = filteredRecordsArray_8;
     }
-
-    console.log(filteredRecordsArray_9);
 
     // searchText ////////////////
 
@@ -886,15 +857,12 @@ const createFilteredRecordsArray = () => {
             }
 
             if (addFlag) {
-                console.log(index);
                 filteredRecordsArray_10.push(el);
             }
         });
     } else {
         filteredRecordsArray_10 = filteredRecordsArray_9;
     }
-
-    console.log(filteredRecordsArray_10);
 
     // recordsArray = filteredRecordsArray_10;
     recordsNumber = filteredRecordsArray_10.length;
@@ -1007,7 +975,6 @@ function slideOne() {
     displayValOne.textContent = sliderOne.value;
 
     if (sliderOne.value === sliderTwo.value) {
-        console.log("HHHHH");
         sliderOne.style.zIndex = "1";
     } else {
         sliderOne.style.zIndex = "0";
@@ -1119,20 +1086,20 @@ recordsOnPageLoc.forEach((el) => {
     });
 });
 
-// show & hide MORE FILTERS //////////////////////////////////////////////////
+const clearFilters = () => {
+    searchInputLoc.value = "";
+    window.location.reload();
+};
 
-dropDownLoc.addEventListener("click", () => {
-    dropDownBtnLoc.classList.toggle("up");
-    if (dropDownFilterLoc.classList.contains("show")) {
-        dropDownFilterLoc.classList.remove("show");
-        dropDownFilterLoc.style.maxHeight = String(0) + "px";
-        moreFiltersLoc.classList.remove("hide");
-        lessFiltersLoc.classList.remove("show");
-    } else {
-        dropDownFilterLoc.classList.add("show");
-        dropDownFilterLoc.style.maxHeight =
-            String(filterListMaxHeight + 200) + "px";
-        moreFiltersLoc.classList.add("hide");
-        lessFiltersLoc.classList.add("show");
-    }
+clearFiltersLoc.addEventListener("click", clearFilters);
+
+clearFilterLoc.forEach((elemFiltr) => {
+    elemFiltr.addEventListener("click", () => {
+        let optArray = elemFiltr.nextElementSibling.querySelectorAll("option");
+        optArray.forEach((elOpt) => {
+            if (elOpt.selected) {
+                elOpt.selected = false;
+            }
+        });
+    });
 });
