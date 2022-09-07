@@ -11,6 +11,7 @@ const sliderTwo = document.getElementById("slider-2");
 const displayValOne = document.getElementById("range1");
 const displayValTwo = document.getElementById("range2");
 const sliderTrack = document.querySelector(".salary .slider-track");
+const pauseLoc = document.querySelector(".salary .pause");
 
 const recNumLoc = document.querySelector(".records-number");
 
@@ -48,8 +49,16 @@ const locationValuesLoc = document.querySelector(
 );
 const displayValThree = document.getElementById("range3");
 
+const recordsOnPageLoc = document.querySelectorAll(".recordsOnPage span");
+
+const pagesContainerLoc = document.querySelector(".pages-container");
+let pageButtonsLoc = document.querySelectorAll(".page");
+
 let apiPage = 1;
+let recordsOnPage = 20;
 let apiDataLength = 0;
+let i = 1;
+let k = recordsOnPage;
 
 let filterBranchesList = [];
 let filterJobFormList = [];
@@ -66,6 +75,8 @@ let isEmpty = true;
 let filterObj = {};
 
 let filterListMaxHeight = 0;
+
+let allowSetPages = true;
 
 remoteLoc.checked = false;
 relocationLoc.checked = false;
@@ -135,9 +146,8 @@ const getAPIPage = (apiPage, filterObj) => {
             if (apiDataLength > 0) {
                 if (apiPage === 1) {
                     resultsLoc.replaceChildren();
-                    recordsNumber = 0; // ???
+                    recordsNumber = 0;
                 }
-
                 showDataInHtml(fetchObj.apiArray, filterObj);
             } else {
                 if (isEmpty) {
@@ -157,6 +167,8 @@ const getAPIPage = (apiPage, filterObj) => {
                     noResultsLoc.classList.remove("active");
                 }
 
+                setPages(recordsNumber);
+
                 function compare(a, b) {
                     return a.city.localeCompare(b.city);
                 }
@@ -170,6 +182,8 @@ const getAPIPage = (apiPage, filterObj) => {
 
 getAPIPage(apiPage, filterObj);
 
+i = 1;
+
 const showDataInHtml = (apiData, filterObj) => {
     isEmpty = Object.keys(filterObj).length === 0;
 
@@ -177,6 +191,9 @@ const showDataInHtml = (apiData, filterObj) => {
 
     apiData.forEach(function (el) {
         // convert specific location structure
+
+        console.log("All " + i);
+        console.log("All " + k);
 
         if (el.options.job_location) {
             parsedJobLocation = JSON.parse(el.options.job_location);
@@ -432,7 +449,7 @@ const showDataInHtml = (apiData, filterObj) => {
                 ) {
                     if (parsedJobLocation.locality) {
                         // distance filtr apply
-                        // if (filterObj.distanceFiltr) {
+
                         if (citiesLoc.value) {
                             let lati = parseFloat(parsedJobLocation.latitude);
                             let longi = parseFloat(parsedJobLocation.longitude);
@@ -461,7 +478,6 @@ const showDataInHtml = (apiData, filterObj) => {
                                 return false;
                             }
                         }
-                        // }
                     }
                 }
             }
@@ -498,11 +514,14 @@ const showDataInHtml = (apiData, filterObj) => {
             });
         }
 
-        resultsLoc.insertAdjacentHTML(
-            "beforeend",
-            `<a href="${
-                el.url
-            }" target="_blank"><div class="result ${borderColorClass}">
+        if (i <= k) {
+            console.log("In cond " + i);
+            console.log("In cond " + k);
+            resultsLoc.insertAdjacentHTML(
+                "beforeend",
+                `<a href="${
+                    el.url
+                }" target="_blank"><div class="result ${borderColorClass}">
                 <div class="top">
                     <div class="top-left">
                         <div class="lang"><p>${el.advert.language}</p></div>
@@ -511,8 +530,8 @@ const showDataInHtml = (apiData, filterObj) => {
                                 el.options.branches ? el.options.branches : ""
                             }</div>
                             <div class="name ${textColorClass}">${
-                el.advert.name
-            }</div>
+                    el.advert.name
+                }</div>
                         </div>
                     </div>
                     <div class="top-right">
@@ -561,7 +580,11 @@ const showDataInHtml = (apiData, filterObj) => {
                 </div>
 
             </div></a>`
-        );
+            );
+
+            // console.log(i);
+        }
+        i++;
     });
 
     // download next 100 records from API
@@ -569,130 +592,123 @@ const showDataInHtml = (apiData, filterObj) => {
 };
 
 // fullfill filters lists
-const filterHTML = () =>
-    // filterBranchesList,
-    // filterJobFormList,
-    // filterJobTypeList,
-    // filterLangList,
-    // filterMinSalary,
-    // filterMaxSalary
-    {
-        // fullfill branches filters list (2 - fullfill lists in HTML) ///////////////////////////////////////////////////////   2
-        if (filterBranchesList.length > 0) {
-            filterBranchesList.sort(function (a, b) {
-                return a.localeCompare(b);
-            });
-            rowHeight = filterBranchesList.length * 21 + 3;
-            filterListMaxHeight = rowHeight;
-            branchesLoc.style.height = String(rowHeight) + "px";
-            filterBranchesList.forEach(function (el) {
-                branchesLoc.insertAdjacentHTML(
-                    "beforeend",
-                    `<option value="${el}">${el}</option>`
-                );
-            });
-        }
-        // fullfill jobforms filters list
-        if (filterJobFormList.length > 0) {
-            filterJobFormList.sort(function (a, b) {
-                return a.localeCompare(b);
-            });
-            rowHeight = filterJobFormList.length * 21 + 3;
-            jobFormLoc.style.height = String(rowHeight) + "px";
-            filterJobFormList.forEach(function (el) {
-                jobFormLoc.insertAdjacentHTML(
-                    "beforeend",
-                    `<option value="${el}">${el}</option>`
-                );
-            });
-        }
-        // fullfill jobtypes filters list
-        if (filterJobTypeList.length > 0) {
-            filterJobTypeList.sort(function (a, b) {
-                return a.localeCompare(b);
-            });
-            rowHeight = filterJobTypeList.length * 21 + 3;
-            jobTypeLoc.style.height = String(rowHeight) + "px";
-            filterJobTypeList.forEach(function (el) {
-                jobTypeLoc.insertAdjacentHTML(
-                    "beforeend",
-                    `<option value="${el}">${el}</option>`
-                );
-            });
-        }
-        // fullfill langs filters list
-        if (filterLangList.length > 0) {
-            filterLangList.sort(function (a, b) {
-                return a.localeCompare(b);
-            });
-            rowHeight = filterLangList.length * 21 + 3;
-            langLoc.style.height = String(rowHeight) + "px";
-            filterLangList.forEach(function (el) {
-                langLoc.insertAdjacentHTML(
-                    "beforeend",
-                    `<option value="${el}">${el}</option>`
-                );
-            });
-        }
-        // fullfill countries filters list
-        if (Object.keys(filterCountriesList).length > 0) {
-            // sort keys (countries) in object
-            const filterCountriesListSorted = Object.keys(filterCountriesList)
-                .sort()
-                .reduce((accumulator, key) => {
-                    accumulator[key] = filterCountriesList[key];
-                    return accumulator;
-                }, {});
+const filterHTML = () => {
+    // fullfill branches filters list (2 - fullfill lists in HTML) ///////////////////////////////////////////////////////   2
+    if (filterBranchesList.length > 0) {
+        filterBranchesList.sort(function (a, b) {
+            return a.localeCompare(b);
+        });
+        rowHeight = filterBranchesList.length * 21 + 3;
+        filterListMaxHeight = rowHeight;
+        branchesLoc.style.height = String(rowHeight) + "px";
+        filterBranchesList.forEach(function (el) {
+            branchesLoc.insertAdjacentHTML(
+                "beforeend",
+                `<option value="${el}">${el}</option>`
+            );
+        });
+    }
+    // fullfill jobforms filters list
+    if (filterJobFormList.length > 0) {
+        filterJobFormList.sort(function (a, b) {
+            return a.localeCompare(b);
+        });
+        rowHeight = filterJobFormList.length * 21 + 3;
+        jobFormLoc.style.height = String(rowHeight) + "px";
+        filterJobFormList.forEach(function (el) {
+            jobFormLoc.insertAdjacentHTML(
+                "beforeend",
+                `<option value="${el}">${el}</option>`
+            );
+        });
+    }
+    // fullfill jobtypes filters list
+    if (filterJobTypeList.length > 0) {
+        filterJobTypeList.sort(function (a, b) {
+            return a.localeCompare(b);
+        });
+        rowHeight = filterJobTypeList.length * 21 + 3;
+        jobTypeLoc.style.height = String(rowHeight) + "px";
+        filterJobTypeList.forEach(function (el) {
+            jobTypeLoc.insertAdjacentHTML(
+                "beforeend",
+                `<option value="${el}">${el}</option>`
+            );
+        });
+    }
+    // fullfill langs filters list
+    if (filterLangList.length > 0) {
+        filterLangList.sort(function (a, b) {
+            return a.localeCompare(b);
+        });
+        rowHeight = filterLangList.length * 21 + 3;
+        langLoc.style.height = String(rowHeight) + "px";
+        filterLangList.forEach(function (el) {
+            langLoc.insertAdjacentHTML(
+                "beforeend",
+                `<option value="${el}">${el}</option>`
+            );
+        });
+    }
+    // fullfill countries filters list
+    if (Object.keys(filterCountriesList).length > 0) {
+        // sort keys (countries) in object
+        const filterCountriesListSorted = Object.keys(filterCountriesList)
+            .sort()
+            .reduce((accumulator, key) => {
+                accumulator[key] = filterCountriesList[key];
+                return accumulator;
+            }, {});
+        countriesLoc.insertAdjacentHTML(
+            "beforeend",
+            `<option value="" class="placeholder">Państwo</option>`
+        );
+
+        let newAllCitiesObj = [];
+        for (let klucz in filterCountriesListSorted) {
             countriesLoc.insertAdjacentHTML(
                 "beforeend",
-                `<option value="" class="placeholder">Państwo</option>`
+                `<option value="${klucz}">${klucz}</option>`
             );
 
-            let newAllCitiesObj = [];
-            for (let klucz in filterCountriesListSorted) {
-                countriesLoc.insertAdjacentHTML(
-                    "beforeend",
-                    `<option value="${klucz}">${klucz}</option>`
-                );
-
-                newAllCitiesObj = newAllCitiesObj.concat(
-                    filterCountriesListSorted[klucz]
-                );
-            }
-
-            let newAllCitiesArray = [];
-            newAllCitiesObj.forEach((el) => {
-                newAllCitiesArray.push(el.city);
-            });
-
-            newAllCitiesArray.sort(function (a, b) {
-                return a.localeCompare(b);
-            });
-
-            citiesLoc.insertAdjacentHTML(
-                "beforeend",
-                `<option value="" class="placeholder">Miasto</option>`
+            newAllCitiesObj = newAllCitiesObj.concat(
+                filterCountriesListSorted[klucz]
             );
-
-            newAllCitiesArray.forEach(function (el) {
-                citiesLoc.insertAdjacentHTML(
-                    "beforeend",
-                    `<option value="${el}" class="active">${el} </option>`
-                );
-            });
         }
 
-        Object.keys(filterObj).length === 0;
+        let newAllCitiesArray = [];
+        newAllCitiesObj.forEach((el) => {
+            newAllCitiesArray.push(el.city);
+        });
 
-        sliderOne.value = filterMinSalary;
-        sliderTwo.value = filterMaxSalary;
-        sliderOne.min = filterMinSalary;
-        sliderTwo.min = filterMinSalary;
-        sliderOne.max = filterMaxSalary;
-        sliderTwo.max = filterMaxSalary;
-        slideOne();
-        slideTwo();
-    };
+        newAllCitiesArray.sort(function (a, b) {
+            return a.localeCompare(b);
+        });
+
+        citiesLoc.insertAdjacentHTML(
+            "beforeend",
+            `<option value="" class="placeholder">Miasto</option>`
+        );
+
+        newAllCitiesArray.forEach(function (el) {
+            citiesLoc.insertAdjacentHTML(
+                "beforeend",
+                `<option value="${el}" class="active">${el} </option>`
+            );
+        });
+    }
+
+    Object.keys(filterObj).length === 0;
+
+    sliderOne.value = filterMinSalary;
+    sliderTwo.value = filterMaxSalary;
+    sliderOne.min = filterMinSalary;
+    sliderTwo.min = filterMinSalary;
+    sliderOne.max = filterMaxSalary;
+    sliderTwo.max = filterMaxSalary;
+    slideOne();
+    slideTwo();
+};
 
 // double range slider
 
@@ -703,6 +719,7 @@ function slideOne() {
         sliderOne.value = parseInt(sliderTwo.value) - minGap;
     }
     displayValOne.textContent = sliderOne.value;
+
     fillColor();
 }
 
@@ -711,6 +728,12 @@ function slideTwo() {
         sliderTwo.value = parseInt(sliderOne.value) + minGap;
     }
     displayValTwo.textContent = sliderTwo.value;
+    if (displayValOne.textContent === "100000") {
+        salaryMarkLoc.disabled = true;
+        displayValOne.textContent = "";
+        displayValTwo.textContent = "";
+        pauseLoc.textContent = "";
+    }
     fillColor();
 }
 
@@ -737,6 +760,9 @@ const getFilteredData = () => {
 
     // create filter Object (3 - put selected options to Object) ///////////////////////////////////////////////////////   3
 
+    // i = 1;
+    // k = recordsOnPage;
+
     filterObj = {};
 
     let selectedBranches = Array.from(branchesChildrenLoc)
@@ -746,7 +772,6 @@ const getFilteredData = () => {
         .map(function (elem) {
             return elem.value;
         });
-
     let selectedJobForms = Array.from(jobFormChildrenLoc)
         .filter(function (elem) {
             return elem.selected;
@@ -972,3 +997,66 @@ citiesLoc.addEventListener("change", function () {
         locationDotLoc.disabled = false;
     }
 });
+
+recordsOnPageLoc.forEach((el) => {
+    el.addEventListener("click", (e) => {
+        recordsOnPageLoc.forEach((elem) => {
+            elem.classList.remove("active");
+        });
+        document
+            .querySelector(`[data-value='${e.target.dataset.value}']`)
+            .classList.add("active");
+
+        recordsOnPage = parseInt(e.target.dataset.value);
+        allowSetPages = true;
+        i = 1;
+        getFilteredData();
+    });
+});
+
+const changePage = (pageBtn) => {
+    pageButtonsLoc.forEach((el) => {
+        el.classList.remove("active");
+    });
+    pageBtn.classList.add("active");
+    // console.log(parseInt(pageBtn.innerText));
+    // console.log(recordsNumber);
+    // console.log(recordsOnPage);
+    // console.log("TEST");
+    i = recordsOnPage * (parseInt(pageBtn.innerText) - 1) + 1;
+    k = recordsOnPage * (parseInt(pageBtn.innerText) - 1) + recordsOnPage;
+    // console.log(i);
+    // console.log(k);
+    allowSetPages = false;
+
+    getFilteredData();
+};
+
+const setPages = (recordsNumber) => {
+    if (allowSetPages) {
+        const pagesQuantity = Math.ceil(recordsNumber / recordsOnPage);
+
+        pagesContainerLoc.replaceChildren();
+
+        for (n = 1; n <= pagesQuantity; n++) {
+            if (n === 1) {
+                pagesContainerLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<div class="page active">${n}</div>`
+                );
+            } else {
+                pagesContainerLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<div class="page">${n}</div>`
+                );
+            }
+        }
+
+        pageButtonsLoc = document.querySelectorAll(".page");
+        pageButtonsLoc.forEach((el) => {
+            el.addEventListener("click", () => {
+                changePage(el);
+            });
+        });
+    }
+};
