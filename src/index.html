@@ -24,6 +24,7 @@
 
             <div class="info-bar">
                 <div class="clear-filters">WYCZYŚĆ WSZYSTKIE FILTRY</div>
+                <div class="recordsOnPage">Wyświetl <span data-value="10">10</span> &sdot; <span data-value="20" class="active">20</span> &sdot; <span data-value="50">50</span> &sdot; <span data-value="100">100</span>&nbsp;ogłoszeń</div>
                 <div class="records-number"></div>
             </div>
 
@@ -51,7 +52,7 @@
                             <div class="slider-container">
                                 <div class="container unactive">
                                     <div class="slider-track"></div>
-                                    <input type="range" min="0" max="400" value="0" step="10" id="loc-slider" oninput="slideThree()" disabled>
+                                    <input type="range" min="0" max="400" value="0" step="10" id="loc-slider" oninput="slideDistance()" disabled>
                                 </div>
                             </div>
                         </div>
@@ -78,8 +79,8 @@
                 <div class="salary">
                     <div class="slider-values unactive">
                         <span id="range1">0</span>
-                        <span>&nbsp;-&nbsp;</span>
-                        <span id="range2">50000</span>
+                        <span class="pause">&nbsp;-&nbsp;</span>
+                        <span id="range2">100000</span>
                     </div>
                     <div class="slider-container">
                         <div class="checkbox-container">
@@ -91,8 +92,8 @@
                         </div>
                         <div class="container unactive">
                             <div class="slider-track"></div>
-                            <input type="range" min="0" max="50000" value="0" step="100" id="slider-1" oninput="slideOne()" disabled>
-                            <input type="range" min="0" max="50000" value="50000" step="100" id="slider-2" oninput="slideTwo()" disabled>
+                            <input type="range" min="0" max="100000" value="0" id="slider-1" oninput="slideOne()" disabled>
+                            <input type="range" min="0" max="100000" value="100000" id="slider-2" oninput="slideTwo()" disabled>
                         </div>
                     </div>
                 </div>
@@ -134,6 +135,9 @@
 
         </div>
         <div class="results"></div>
+        <div class="pages-container">
+            
+        </div>
         <div class="no-results">
             <!-- <img src="./img/frown.svg" alt="frown"> -->
         </div>

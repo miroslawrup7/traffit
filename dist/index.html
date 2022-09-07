@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/main.min.css?cache_bust=1662103164753" />
-
+    <link rel="stylesheet" href="./css/main.min.css?cache_bust=1662561291029" />
+    
     <title>Grupa Progres</title>
 </head>
 <body>
@@ -24,11 +24,12 @@
 
             <div class="info-bar">
                 <div class="clear-filters">WYCZYŚĆ WSZYSTKIE FILTRY</div>
+                <div class="recordsOnPage">Wyświetl <span data-value="10">10</span> &sdot; <span data-value="20" class="active">20</span> &sdot; <span data-value="50">50</span> &sdot; <span data-value="100">100</span>&nbsp;ogłoszeń</div>
                 <div class="records-number"></div>
             </div>
 
             <div class="drop-down-filters">
-
+            
                 <div class="loc-and-checkboxes">
                     <div class="loc-container">
                         <div class="checkbox-container">
@@ -51,7 +52,7 @@
                             <div class="slider-container">
                                 <div class="container unactive">
                                     <div class="slider-track"></div>
-                                    <input type="range" min="0" max="400" value="0" step="10" id="loc-slider" oninput="slideThree()" disabled>
+                                    <input type="range" min="0" max="400" value="0" step="10" id="loc-slider" oninput="slideDistance()" disabled>
                                 </div>
                             </div>
                         </div>
@@ -78,8 +79,8 @@
                 <div class="salary">
                     <div class="slider-values unactive">
                         <span id="range1">0</span>
-                        <span>&nbsp;-&nbsp;</span>
-                        <span id="range2">50000</span>
+                        <span class="pause">&nbsp;-&nbsp;</span>
+                        <span id="range2">100000</span>
                     </div>
                     <div class="slider-container">
                         <div class="checkbox-container">
@@ -91,19 +92,19 @@
                         </div>
                         <div class="container unactive">
                             <div class="slider-track"></div>
-                            <input type="range" min="0" max="50000" value="0" step="100" id="slider-1" oninput="slideOne()" disabled>
-                            <input type="range" min="0" max="50000" value="50000" step="100" id="slider-2" oninput="slideTwo()" disabled>
+                            <input type="range" min="0" max="100000" value="0" id="slider-1" oninput="slideOne()" disabled>
+                            <input type="range" min="0" max="100000" value="100000" id="slider-2" oninput="slideTwo()" disabled>
                         </div>
                     </div>
                 </div>
-
+                
                 <div class="lists">
                     <div class="list">
                         <label for="branches">Branża</label>
                         <select class="branches" name="branches" id="branches" multiple></select>
                         <div class="clear-list">WYCZYŚĆ FILTR</div>
                     </div>
-
+                    
 
                     <div class="list">
                         <label for="job-form">Forma zatrudnienia</label>
@@ -134,15 +135,18 @@
 
         </div>
         <div class="results"></div>
+        <div class="pages-container">
+            
+        </div>
         <div class="no-results">
             <!-- <img src="./img/frown.svg" alt="frown"> -->
         </div>
     </main>
     <footer></footer>
-
+   
     <!-- <div id="traffit-an-filters-xtxrxaxfxixtx2x0x1x6x"></div>
     <div id="traffit-an-list-xtxrxaxfxixtx2x0x1x6x"></div>
     <script type="application/javascript" src="https://grupaprogres.traffit.com/public/an/generateJs/"></script> -->
-    <script src="./js/all.min.js?cache_bust=1662103164753"></script>
+    <script src="./js/all.min.js?cache_bust=1662561291029"></script>
 </body>
 </html>

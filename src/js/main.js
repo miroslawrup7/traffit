@@ -1,36 +1,8 @@
-const resultsLoc = document.querySelector(".results");
-const branchesLoc = document.querySelector(".branches");
-const jobFormLoc = document.querySelector(".job-form");
-const jobTypeLoc = document.querySelector(".job-type");
-const langLoc = document.querySelector(".lang");
-const countriesLoc = document.querySelector(".countries");
-const citiesLoc = document.querySelector(".cities");
-
-const sliderOne = document.getElementById("slider-1");
-const sliderTwo = document.getElementById("slider-2");
-const displayValOne = document.getElementById("range1");
-const displayValTwo = document.getElementById("range2");
-const sliderTrack = document.querySelector(".salary .slider-track");
-
 const recNumLoc = document.querySelector(".records-number");
-
-const searchBtn = document.querySelector(".search-btn");
-
-const remoteLoc = document.querySelector("#remote");
-const relocationLoc = document.querySelector("#relocation");
-const salaryMarkLoc = document.querySelector("#salary-mark");
-const salarySliderLoc = document.querySelector(
-    ".salary .slider-container .container"
-);
-const salaryValuesLoc = document.querySelector(".salary .slider-values");
-const salaryMinDotLoc = document.querySelector("#slider-1");
-const salaryMaxDotLoc = document.querySelector("#slider-2");
-
-const searchInputLoc = document.querySelector(".search-input input");
-
-const clearFiltersLoc = document.querySelector(".clear-filters");
-const clearFilterLoc = document.querySelectorAll(".lists .clear-list");
 const noResultsLoc = document.querySelector(".no-results");
+const resultsLoc = document.querySelector(".results");
+const pagesSwitchLoc = document.querySelector(".pages-container");
+let pageButtonsLoc = document.querySelectorAll(".page");
 
 const dropDownFilterLoc = document.querySelector(".drop-down-filters");
 const dropDownLoc = document.querySelector(".drop-down-btn");
@@ -38,18 +10,47 @@ const dropDownBtnLoc = document.querySelector(".drop-down-btn img");
 const moreFiltersLoc = document.querySelector(".more-filters");
 const lessFiltersLoc = document.querySelector(".less-filters");
 
+const recordsOnPageLoc = document.querySelectorAll(".recordsOnPage span");
+
+const branchesLoc = document.querySelector(".branches");
+const jobFormLoc = document.querySelector(".job-form");
+const jobTypeLoc = document.querySelector(".job-type");
+const langLoc = document.querySelector(".lang");
+const countriesLoc = document.querySelector(".countries");
+const citiesLoc = document.querySelector(".cities");
+
 const locationMarkLoc = document.querySelector("#localization");
+const locationDotLoc = document.querySelector("#loc-slider");
 const locationSliderLoc = document.querySelector(
     ".distance-slider .slider-container .container"
 );
-const locationDotLoc = document.querySelector("#loc-slider");
 const locationValuesLoc = document.querySelector(
     ".distance-slider .slider-values"
 );
-const displayValThree = document.getElementById("range3");
+const displayValDistance = document.getElementById("range3");
+
+const salaryMarkLoc = document.querySelector("#salary-mark");
+const salarySliderLoc = document.querySelector(
+    ".salary .slider-container .container"
+);
+const salaryValuesLoc = document.querySelector(".salary .slider-values");
+const sliderOne = document.querySelector("#slider-1");
+const sliderTwo = document.querySelector("#slider-2");
+const displayValOne = document.getElementById("range1");
+const displayValTwo = document.getElementById("range2");
+const sliderTrack = document.querySelector(".salary .slider-track");
+const pauseLoc = document.querySelector(".salary .pause");
+
+const remoteLoc = document.querySelector("#remote");
+const relocationLoc = document.querySelector("#relocation");
+
+const searchInputLoc = document.querySelector(".search-input input");
+
+const searchBtn = document.querySelector(".search-btn");
 
 let apiPage = 1;
-let apiDataLength = 0;
+let rawAPIArray = [];
+let allRecordsArray = [];
 
 let filterBranchesList = [];
 let filterJobFormList = [];
@@ -60,674 +61,414 @@ let filterMaxSalary = 0;
 let filterCountriesList = {};
 
 let recordsNumber = 0;
-
-let isEmpty = true;
-
-let filterObj = {};
+let firstRecordNumber = 0;
+let recordsOnPage = 20;
 
 let filterListMaxHeight = 0;
+
+let filtersON = false;
+let filteredRecordsArray_10 = [];
+
+searchInputLoc.value = "";
+
+locationMarkLoc.checked = false;
+locationDotLoc.disabled = true;
+countriesLoc.disabled = true;
+citiesLoc.disabled = true;
+locationDotLoc.value = 0;
+
+salaryMarkLoc.checked = false;
+sliderOne.disabled = true;
+sliderTwo.disabled = true;
 
 remoteLoc.checked = false;
 relocationLoc.checked = false;
 
-salaryMarkLoc.checked = false;
-salaryMinDotLoc.disabled = true;
-salaryMaxDotLoc.disabled = true;
-
-salaryMarkLoc.addEventListener("change", function (e) {
-    if (e.target.checked) {
-        salarySliderLoc.classList.remove("unactive");
-        salaryValuesLoc.classList.remove("unactive");
-        salaryMinDotLoc.disabled = false;
-        salaryMaxDotLoc.disabled = false;
-    } else {
-        salarySliderLoc.classList.add("unactive");
-        salaryValuesLoc.classList.add("unactive");
-        salaryMinDotLoc.disabled = true;
-        salaryMaxDotLoc.disabled = true;
+// create FILTER DATA from API data ///////////////////////////////////////////////
+const createDataForFilters = (
+    branche,
+    jobForm,
+    jobType,
+    lang,
+    visibleRate,
+    salaryFrom,
+    salaryTo,
+    country,
+    city,
+    lati,
+    longi
+) => {
+    if (filterBranchesList.indexOf(branche) === -1) {
+        filterBranchesList.push(branche);
     }
-});
-
-const getAPI = (apiPage) => {
-    return new Promise((resolve) => {
-        resolve(
-            fetch(
-                "https://grupaprogres.traffit.com/public/job_posts/published",
-                {
-                    mode: "cors",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-Request-Page-Size": "100",
-                        "X-Request-Current-Page": apiPage,
-                        "X-Request-Sort":
-                            '{"sort_by": "id", "direction": "ASC"}',
-                    },
-                }
-            )
-        );
-    });
-};
-
-const getAPIJSON = (apiData) => {
-    return new Promise((resolve) => {
-        resolve(apiData.json());
-    });
-};
-
-const getAPIJSONLen = (apiDataJSON) => {
-    return new Promise((resolve) => {
-        resolve({ apiArray: apiDataJSON, apiArrayLen: apiDataJSON.length });
-    });
-};
-
-const getAPIPage = (apiPage, filterObj) => {
-    getAPI(apiPage)
-        .then((apiData) => {
-            return getAPIJSON(apiData);
-        })
-
-        .then((apiDataJSON) => {
-            return getAPIJSONLen(apiDataJSON);
-        })
-
-        .then((fetchObj) => {
-            apiDataLength = fetchObj.apiArrayLen;
-            if (apiDataLength > 0) {
-                if (apiPage === 1) {
-                    resultsLoc.replaceChildren();
-                    recordsNumber = 0; // ???
-                }
-
-                showDataInHtml(fetchObj.apiArray, filterObj);
-            } else {
-                if (isEmpty) {
-                    filterHTML(
-                        filterBranchesList,
-                        filterJobFormList,
-                        filterJobTypeList,
-                        filterLangList,
-                        filterMinSalary,
-                        filterMaxSalary
-                    );
-                }
-                recNumLoc.innerText = `Znaleziono ${recordsNumber} ogłoszeń`;
-                if (!recordsNumber) {
-                    noResultsLoc.classList.add("active");
-                } else {
-                    noResultsLoc.classList.remove("active");
-                }
-
-                function compare(a, b) {
-                    return a.city.localeCompare(b.city);
-                }
-
-                for (let key in filterCountriesList) {
-                    filterCountriesList[key].sort(compare);
-                }
+    if (jobForm) {
+        jobForm.forEach(function (elem) {
+            if (filterJobFormList.indexOf(elem) === -1) {
+                filterJobFormList.push(elem);
             }
         });
+    }
+    if (filterJobTypeList.indexOf(jobType) === -1) {
+        filterJobTypeList.push(jobType);
+    }
+    if (filterLangList.indexOf(lang) === -1) {
+        filterLangList.push(lang);
+    }
+    if (visibleRate) {
+        if (salaryFrom < filterMinSalary) {
+            filterMinSalary = salaryFrom;
+        }
+        if (salaryTo > filterMaxSalary) {
+            filterMaxSalary = salaryTo;
+        }
+    }
+    if (filterCountriesList[country]) {
+        if (
+            filterCountriesList[country].findIndex(
+                (arr_el) => arr_el.city === city
+            ) === -1
+        ) {
+            filterCountriesList[country].push({
+                city: city,
+                lati: lati,
+                longi: longi,
+            });
+        }
+    } else {
+        filterCountriesList[country] = [];
+        filterCountriesList[country].push({
+            city: city,
+            lati: lati,
+            longi: longi,
+        });
+    }
 };
 
-getAPIPage(apiPage, filterObj);
-
-const showDataInHtml = (apiData, filterObj) => {
-    isEmpty = Object.keys(filterObj).length === 0;
-
-    let parsedJobLocation;
-
-    apiData.forEach(function (el) {
-        // convert specific location structure
-
+// create OBJECTS ARRAY from Raw API JSON ///////////////////////////////////////////////
+const reworkData = (rawAPIArray) => {
+    rawAPIArray.forEach((el) => {
         if (el.options.job_location) {
             parsedJobLocation = JSON.parse(el.options.job_location);
         }
 
-        if (isEmpty) {
-            // branches filter create (1 - create Array) ///////////////////////////////////////////////////////    1
+        allRecordsArray.push({
+            url: el.url,
+            name: el.advert.name,
+            branche: el.options.branches,
+            lang: el.advert.language,
+            jobType: el.options.job_type,
+            visibleRate: parseInt(el.options._Widoczna_stawka),
+            salaryFrom: parseInt(el.options._spodziewane_wynagrodzenie_od),
+            salaryTo: parseInt(el.options._spodziewane_wynagrodzenie_do),
+            remote: el.options.remote,
+            relocation: el.options._relokacja,
+            recruitmentType: el.options._rekrutacja_rodzaj,
+            jobForm: el.options._forma_zatrudnienia,
+            country: parsedJobLocation.country,
+            city: parsedJobLocation.locality,
+            lati: parseFloat(parsedJobLocation.latitude),
+            longi: parseFloat(parsedJobLocation.longitude),
+            description: el.advert.values,
+        });
 
-            if (
-                filterBranchesList.findIndex(
-                    (arr_el) => arr_el === el.options.branches
-                ) === -1
-            ) {
-                filterBranchesList.push(el.options.branches);
-            }
-
-            // job form filter create
-            if (el.options._forma_zatrudnienia) {
-                el.options._forma_zatrudnienia.forEach(function (elem) {
-                    if (
-                        filterJobFormList.findIndex(
-                            (arr_el) => arr_el === elem
-                        ) === -1
-                    ) {
-                        filterJobFormList.push(elem);
-                    }
-                });
-            }
-
-            // job type filter create
-            if (
-                filterJobTypeList.findIndex(
-                    (arr_el) => arr_el === el.options.job_type
-                ) === -1
-            ) {
-                filterJobTypeList.push(el.options.job_type);
-            }
-
-            // lang filter create
-            if (
-                filterLangList.findIndex(
-                    (arr_el) => arr_el === el.advert.language
-                ) === -1
-            ) {
-                filterLangList.push(el.advert.language);
-            }
-
-            // salary filter create
-            if (parseInt(el.options._Widoczna_stawka)) {
-                if (
-                    parseInt(el.options._spodziewane_wynagrodzenie_od) <
-                    filterMinSalary
-                ) {
-                    filterMinSalary = el.options._spodziewane_wynagrodzenie_od;
-                }
-
-                if (
-                    parseInt(el.options._spodziewane_wynagrodzenie_do) >
-                    filterMaxSalary
-                ) {
-                    filterMaxSalary = el.options._spodziewane_wynagrodzenie_do;
-                }
-            }
-
-            // countries & cities create
-            if (filterCountriesList[parsedJobLocation.country]) {
-                if (
-                    filterCountriesList[parsedJobLocation.country].findIndex(
-                        (arr_el) => arr_el.city === parsedJobLocation.locality
-                    ) === -1
-                ) {
-                    filterCountriesList[parsedJobLocation.country].push({
-                        city: parsedJobLocation.locality,
-                        lati: parseFloat(parsedJobLocation.latitude),
-                        longi: parseFloat(parsedJobLocation.longitude),
-                    });
-                }
-            } else {
-                filterCountriesList[parsedJobLocation.country] = [];
-                filterCountriesList[parsedJobLocation.country].push({
-                    city: parsedJobLocation.locality,
-                    lati: parseFloat(parsedJobLocation.latitude),
-                    longi: parseFloat(parsedJobLocation.longitude),
-                });
-            }
-        } else {
-            // branches filter apply (4 - download only selected data) /////////////////////////////////////////////////////  4
-            if (filterObj.branchesFiltr.length) {
-                if (
-                    filterObj.branchesFiltr.indexOf(el.options.branches) === -1
-                ) {
-                    if (filterObj.branchesFiltr.length) {
-                        return false;
-                    }
-                }
-            }
-
-            // jobForm filter apply
-            if (filterObj.jobFormsFiltr.length) {
-                let selectedJobFormsFiltr = false;
-
-                if (el.options._forma_zatrudnienia) {
-                    el.options._forma_zatrudnienia.forEach(function (elem) {
-                        if (filterObj.jobFormsFiltr.length) {
-                            if (filterObj.jobFormsFiltr.indexOf(elem) !== -1) {
-                                selectedJobFormsFiltr = true;
-                            }
-                        }
-                    });
-                    if (!selectedJobFormsFiltr) {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            }
-
-            // jobType filter apply
-            if (filterObj.jobTypesFiltr.length) {
-                if (
-                    filterObj.jobTypesFiltr.indexOf(el.options.job_type) === -1
-                ) {
-                    if (filterObj.jobTypesFiltr.length) {
-                        return false;
-                    }
-                }
-            }
-
-            // lang filter apply
-            if (filterObj.langsFiltr.length) {
-                if (filterObj.langsFiltr.indexOf(el.advert.language) === -1) {
-                    if (filterObj.langsFiltr.length) {
-                        return false;
-                    }
-                }
-            }
-
-            // remote filter apply
-            if (filterObj.remoteFiltr) {
-                if (!el.options.remote) {
-                    return false;
-                }
-            }
-
-            // relocation filter apply
-            if (filterObj.relocationFiltr) {
-                if (!el.options._relokacja) {
-                    return false;
-                }
-            }
-
-            // salary filter apply
-            if (filterObj.salary[0] || filterObj.salary[1]) {
-                if (el.options._Widoczna_stawka == 1) {
-                    if (
-                        el.options._spodziewane_wynagrodzenie_od &&
-                        el.options._spodziewane_wynagrodzenie_do
-                    ) {
-                        if (
-                            filterObj.salary[0] <
-                                el.options._spodziewane_wynagrodzenie_od &&
-                            filterObj.salary[1] <
-                                el.options._spodziewane_wynagrodzenie_od
-                        ) {
-                            return false;
-                        }
-                        if (
-                            filterObj.salary[0] >
-                                el.options._spodziewane_wynagrodzenie_do &&
-                            filterObj.salary[1] >
-                                el.options._spodziewane_wynagrodzenie_do
-                        ) {
-                            return false;
-                        }
-                    }
-
-                    if (
-                        el.options._spodziewane_wynagrodzenie_od &&
-                        !el.options._spodziewane_wynagrodzenie_do
-                    ) {
-                        if (
-                            filterObj.salary[0] <
-                                el.options._spodziewane_wynagrodzenie_od &&
-                            filterObj.salary[1] <
-                                el.options._spodziewane_wynagrodzenie_od
-                        ) {
-                            return false;
-                        }
-                    }
-
-                    if (
-                        !el.options._spodziewane_wynagrodzenie_od &&
-                        el.options._spodziewane_wynagrodzenie_do
-                    ) {
-                        if (
-                            filterObj.salary[0] >
-                                el.options._spodziewane_wynagrodzenie_do &&
-                            filterObj.salary[1] >
-                                el.options._spodziewane_wynagrodzenie_do
-                        ) {
-                            return false;
-                        }
-                    }
-                } else {
-                    return false;
-                }
-            }
-
-            // search text apply
-            if (filterObj.searchText) {
-                let foundWord = false;
-                let position = -1;
-                el.advert.values.forEach(function (elem) {
-                    if (elem.value && elem.field_id !== "geolocation") {
-                        position = elem.value
-                            .toLowerCase()
-                            .search(filterObj.searchText.toLowerCase());
-                        if (position !== -1) {
-                            foundWord = true;
-                        }
-                    }
-                });
-                position = el.advert.name
-                    .toLowerCase()
-                    .search(filterObj.searchText.toLowerCase());
-                if (position !== -1) {
-                    foundWord = true;
-                }
-                if (!foundWord) {
-                    return false;
-                }
-            }
-
-            // countries filtr apply
-            if (filterObj.countriesFiltr[0]) {
-                if (
-                    filterObj.countriesFiltr.indexOf(
-                        parsedJobLocation.country
-                    ) === -1
-                ) {
-                    if (parsedJobLocation.country) {
-                        return false;
-                    }
-                }
-            }
-
-            // cities filtr apply
-            if (filterObj.citiesFiltr[0]) {
-                if (
-                    filterObj.citiesFiltr.indexOf(
-                        parsedJobLocation.locality
-                    ) === -1
-                ) {
-                    if (parsedJobLocation.locality) {
-                        // distance filtr apply
-                        // if (filterObj.distanceFiltr) {
-                        if (citiesLoc.value) {
-                            let lati = parseFloat(parsedJobLocation.latitude);
-                            let longi = parseFloat(parsedJobLocation.longitude);
-                            let km = filterObj.distanceFiltr;
-
-                            let min_lati = filterObj.latiFiltr - km * 0.009044;
-                            let max_lati = filterObj.latiFiltr + km * 0.009044;
-                            let min_longi =
-                                filterObj.longiFiltr -
-                                (km * 0.0089831) /
-                                    Math.cos(
-                                        (filterObj.latiFiltr * Math.PI) / 180
-                                    );
-                            let max_longi =
-                                filterObj.longiFiltr +
-                                (km * 0.0089831) /
-                                    Math.cos(
-                                        (filterObj.latiFiltr * Math.PI) / 180
-                                    );
-                            if (
-                                lati > max_lati ||
-                                lati < min_lati ||
-                                longi > max_longi ||
-                                longi < min_longi
-                            ) {
-                                return false;
-                            }
-                        }
-                        // }
-                    }
-                }
-            }
-        }
-
-        // records number counting
-        recordsNumber++;
-
-        // colouring of records by type of recruitment
-
-        let borderColorClass = "";
-        let textColorClass = "";
-
-        if (el.options._rekrutacja_rodzaj === "PT") {
-            borderColorClass = "pt-border";
-            textColorClass = "pt-text";
-        }
-        if (el.options._rekrutacja_rodzaj === "RS") {
-            borderColorClass = "rs-border";
-            textColorClass = "rs-text";
-        }
-        if (el.options._rekrutacja_rodzaj === "WEW") {
-            borderColorClass = "wew-border";
-            textColorClass = "wew-text";
-        }
-
-        // creating HTML code for record
-
-        let formaZatrudnienia = "";
-
-        if (el.options._forma_zatrudnienia) {
-            el.options._forma_zatrudnienia.forEach(function (elem) {
-                formaZatrudnienia = formaZatrudnienia + "<p>" + elem + "</p>";
-            });
-        }
-
-        resultsLoc.insertAdjacentHTML(
-            "beforeend",
-            `<a href="${
-                el.url
-            }" target="_blank"><div class="result ${borderColorClass}">
-                <div class="top">
-                    <div class="top-left">
-                        <div class="lang"><p>${el.advert.language}</p></div>
-                        <div class="branche-name">
-                            <div class="branche">${
-                                el.options.branches ? el.options.branches : ""
-                            }</div>
-                            <div class="name ${textColorClass}">${
-                el.advert.name
-            }</div>
-                        </div>
-                    </div>
-                    <div class="top-right">
-                        ${
-                            el.options.job_type
-                                ? "<div class='jobtype'>" +
-                                  el.options.job_type +
-                                  "</div>"
-                                : ""
-                        }
-                        ${
-                            el.options._Widoczna_stawka
-                                ? el.options._spodziewane_wynagrodzenie_od &&
-                                  el.options._spodziewane_wynagrodzenie_do
-                                    ? "<div class='salary'>" +
-                                      el.options._spodziewane_wynagrodzenie_od +
-                                      " - " +
-                                      el.options._spodziewane_wynagrodzenie_do +
-                                      "</div>"
-                                    : ""
-                                : ""
-                        }
-                    </div>
-                </div>
-
-                <div class="bottom">
-                    <div class="bottom-left">
-                        <div class="city"><img src="./img/location_dot.svg">${
-                            parsedJobLocation.locality
-                        }</div>
-                        ${
-                            el.options.remote
-                                ? "<div class='remote'>zdalna</div>"
-                                : ""
-                        }
-                        ${
-                            el.options._relokacja
-                                ? "<div class='relocation'>relocation</div>"
-                                : ""
-                        }
-                    </div>
-                        <div class="bottom-right">
-                            <div class="employmentform">${formaZatrudnienia}</div>
-                        </div>
-                    </div>
-                </div>
-
-            </div></a>`
+        createDataForFilters(
+            el.options.branches,
+            el.options._forma_zatrudnienia,
+            el.options.job_type,
+            el.advert.language,
+            parseInt(el.options._Widoczna_stawka),
+            parseInt(el.options._spodziewane_wynagrodzenie_od),
+            parseInt(el.options._spodziewane_wynagrodzenie_do),
+            parsedJobLocation.country,
+            parsedJobLocation.locality,
+            parseFloat(parsedJobLocation.latitude),
+            parseFloat(parsedJobLocation.longitude)
         );
     });
-
-    // download next 100 records from API
-    getAPIPage(++apiPage, filterObj);
 };
 
-// fullfill filters lists
-const filterHTML = () =>
-    // filterBranchesList,
-    // filterJobFormList,
-    // filterJobTypeList,
-    // filterLangList,
-    // filterMinSalary,
-    // filterMaxSalary
-    {
-        // fullfill branches filters list (2 - fullfill lists in HTML) ///////////////////////////////////////////////////////   2
-        if (filterBranchesList.length > 0) {
-            filterBranchesList.sort(function (a, b) {
-                return a.localeCompare(b);
-            });
-            rowHeight = filterBranchesList.length * 21 + 3;
-            filterListMaxHeight = rowHeight;
-            branchesLoc.style.height = String(rowHeight) + "px";
-            filterBranchesList.forEach(function (el) {
-                branchesLoc.insertAdjacentHTML(
-                    "beforeend",
-                    `<option value="${el}">${el}</option>`
-                );
-            });
-        }
-        // fullfill jobforms filters list
-        if (filterJobFormList.length > 0) {
-            filterJobFormList.sort(function (a, b) {
-                return a.localeCompare(b);
-            });
-            rowHeight = filterJobFormList.length * 21 + 3;
-            jobFormLoc.style.height = String(rowHeight) + "px";
-            filterJobFormList.forEach(function (el) {
-                jobFormLoc.insertAdjacentHTML(
-                    "beforeend",
-                    `<option value="${el}">${el}</option>`
-                );
-            });
-        }
-        // fullfill jobtypes filters list
-        if (filterJobTypeList.length > 0) {
-            filterJobTypeList.sort(function (a, b) {
-                return a.localeCompare(b);
-            });
-            rowHeight = filterJobTypeList.length * 21 + 3;
-            jobTypeLoc.style.height = String(rowHeight) + "px";
-            filterJobTypeList.forEach(function (el) {
-                jobTypeLoc.insertAdjacentHTML(
-                    "beforeend",
-                    `<option value="${el}">${el}</option>`
-                );
-            });
-        }
-        // fullfill langs filters list
-        if (filterLangList.length > 0) {
-            filterLangList.sort(function (a, b) {
-                return a.localeCompare(b);
-            });
-            rowHeight = filterLangList.length * 21 + 3;
-            langLoc.style.height = String(rowHeight) + "px";
-            filterLangList.forEach(function (el) {
-                langLoc.insertAdjacentHTML(
-                    "beforeend",
-                    `<option value="${el}">${el}</option>`
-                );
-            });
-        }
-        // fullfill countries filters list
-        if (Object.keys(filterCountriesList).length > 0) {
-            // sort keys (countries) in object
-            const filterCountriesListSorted = Object.keys(filterCountriesList)
-                .sort()
-                .reduce((accumulator, key) => {
-                    accumulator[key] = filterCountriesList[key];
-                    return accumulator;
-                }, {});
-            countriesLoc.insertAdjacentHTML(
-                "beforeend",
-                `<option value="" class="placeholder">Państwo</option>`
-            );
+// show RECORDS NUMBER ///////////////////////////////////////////////
 
-            let newAllCitiesObj = [];
-            for (let klucz in filterCountriesListSorted) {
-                countriesLoc.insertAdjacentHTML(
-                    "beforeend",
-                    `<option value="${klucz}">${klucz}</option>`
-                );
+const summariseDownload = (recordsNumber) => {
+    recNumLoc.innerText = `Znaleziono ${recordsNumber} ogłoszeń`;
+    if (!recordsNumber) {
+        noResultsLoc.classList.add("active");
+    } else {
+        noResultsLoc.classList.remove("active");
+    }
+};
 
-                newAllCitiesObj = newAllCitiesObj.concat(
-                    filterCountriesListSorted[klucz]
-                );
+// create RECORDS BOXES ///////////////////////////////////////////////
+
+const createRecordBoxes = (recordsArray, firstRecordNumber, recordsOnPage) => {
+    resultsLoc.replaceChildren();
+
+    for (i = firstRecordNumber; i < recordsOnPage; i++) {
+        // colouring of records by type of recruitment
+
+        if (recordsArray[i]) {
+            let borderColorClass = "";
+            let textColorClass = "";
+
+            if (recordsArray[i].recruitmentType === "PT") {
+                borderColorClass = "pt-border";
+                textColorClass = "pt-text";
+            }
+            if (recordsArray[i].recruitmentType === "RS") {
+                borderColorClass = "rs-border";
+                textColorClass = "rs-text";
+            }
+            if (recordsArray[i].recruitmentType === "WEW") {
+                borderColorClass = "wew-border";
+                textColorClass = "wew-text";
             }
 
-            let newAllCitiesArray = [];
-            newAllCitiesObj.forEach((el) => {
-                newAllCitiesArray.push(el.city);
-            });
+            let formaZatrudnienia = "";
 
-            newAllCitiesArray.sort(function (a, b) {
-                return a.localeCompare(b);
-            });
+            if (recordsArray[i].jobForm) {
+                recordsArray[i].jobForm.forEach(function (elem) {
+                    formaZatrudnienia =
+                        formaZatrudnienia + "<p>" + elem + "</p>";
+                });
+            }
 
-            citiesLoc.insertAdjacentHTML(
+            resultsLoc.insertAdjacentHTML(
                 "beforeend",
-                `<option value="" class="placeholder">Miasto</option>`
-            );
+                `<a href="${
+                    recordsArray[i].url
+                }" target="_blank"><div class="result ${borderColorClass}">
+            <div class="top">
+                <div class="top-left">
+                    <div class="lang"><p>${recordsArray[i].lang}</p></div>
+                    <div class="branche-name">
+                        <div class="branche">${
+                            recordsArray[i].branche
+                                ? recordsArray[i].branche
+                                : ""
+                        }</div>
+                        <div class="name ${textColorClass}">${
+                    recordsArray[i].name
+                }</div>
+                    </div>
+                </div>
+                <div class="top-right">
+                    ${
+                        recordsArray[i].jobType
+                            ? "<div class='jobtype'>" +
+                              recordsArray[i].jobType +
+                              "</div>"
+                            : ""
+                    }
+                    ${
+                        recordsArray[i].visibleRate
+                            ? recordsArray[i].salaryFrom &&
+                              recordsArray[i].salaryTo
+                                ? "<div class='salary'>" +
+                                  recordsArray[i].salaryFrom +
+                                  " - " +
+                                  recordsArray[i].salaryTo +
+                                  "</div>"
+                                : ""
+                            : ""
+                    }
+                </div>
+            </div>
 
-            newAllCitiesArray.forEach(function (el) {
-                citiesLoc.insertAdjacentHTML(
-                    "beforeend",
-                    `<option value="${el}" class="active">${el} </option>`
-                );
-            });
+            <div class="bottom">
+                <div class="bottom-left">
+                    <div class="city"><img src="./img/location_dot.svg">${
+                        recordsArray[i].city
+                    }</div>
+                    ${
+                        recordsArray[i].remote
+                            ? "<div class='remote'>zdalna</div>"
+                            : ""
+                    }
+                    ${
+                        recordsArray[i].relocation
+                            ? "<div class='relocation'>relocation</div>"
+                            : ""
+                    }
+                </div>
+                    <div class="bottom-right">
+                        <div class="employmentform">${formaZatrudnienia}</div>
+                    </div>
+                </div>
+            </div>
+
+        </div></a>`
+            );
+        }
+    }
+};
+
+// gets DATA FROM API ///////////////////////////////////////////////
+
+const getAPI = (apiPage) => {
+    const response = fetch(
+        "https://grupaprogres.traffit.com/public/job_posts/published",
+        {
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Request-Page-Size": "100",
+                "X-Request-Current-Page": apiPage,
+                "X-Request-Sort": '{"sort_by": "id", "direction": "ASC"}',
+            },
+        }
+    );
+
+    return response;
+};
+
+const loopOnAPI = (jsonData) => {
+    if (jsonData.length > 0) {
+        rawAPIArray = rawAPIArray.concat(jsonData);
+        apiPage++;
+        createRecordsObjFromAPI(apiPage);
+    } else {
+        reworkData(rawAPIArray);
+        recordsNumber = rawAPIArray.length;
+        summariseDownload(recordsNumber);
+        createRecordBoxes(allRecordsArray, firstRecordNumber, recordsOnPage);
+        setPages(recordsNumber);
+        createFilterLists();
+    }
+};
+
+async function createRecordsObjFromAPI(apiPage) {
+    const rawData = await getAPI(apiPage);
+    const jsonData = await rawData.json();
+    loopOnAPI(jsonData);
+}
+
+createRecordsObjFromAPI(apiPage);
+
+// create HTML FILTERS LISTS //////////////////////////////////////////////////////
+
+const createFilterLists = () => {
+    if (filterBranchesList.length > 0) {
+        filterBranchesList.sort(function (a, b) {
+            return a.localeCompare(b);
+        });
+        rowHeight = filterBranchesList.length * 21 + 3;
+        filterListMaxHeight = rowHeight;
+        branchesLoc.style.height = String(rowHeight) + "px";
+        filterBranchesList.forEach(function (el) {
+            branchesLoc.insertAdjacentHTML(
+                "beforeend",
+                `<option value="${el}">${el}</option>`
+            );
+        });
+    }
+
+    if (filterJobFormList.length > 0) {
+        filterJobFormList.sort(function (a, b) {
+            return a.localeCompare(b);
+        });
+        rowHeight = filterJobFormList.length * 21 + 3;
+        jobFormLoc.style.height = String(rowHeight) + "px";
+        filterJobFormList.forEach(function (el) {
+            jobFormLoc.insertAdjacentHTML(
+                "beforeend",
+                `<option value="${el}">${el}</option>`
+            );
+        });
+    }
+
+    if (filterJobTypeList.length > 0) {
+        filterJobTypeList.sort(function (a, b) {
+            return a.localeCompare(b);
+        });
+        rowHeight = filterJobTypeList.length * 21 + 3;
+        jobTypeLoc.style.height = String(rowHeight) + "px";
+        filterJobTypeList.forEach(function (el) {
+            jobTypeLoc.insertAdjacentHTML(
+                "beforeend",
+                `<option value="${el}">${el}</option>`
+            );
+        });
+    }
+
+    if (filterLangList.length > 0) {
+        filterLangList.sort(function (a, b) {
+            return a.localeCompare(b);
+        });
+        rowHeight = filterLangList.length * 21 + 3;
+        langLoc.style.height = String(rowHeight) + "px";
+        filterLangList.forEach(function (el) {
+            langLoc.insertAdjacentHTML(
+                "beforeend",
+                `<option value="${el}">${el}</option>`
+            );
+        });
+    }
+
+    if (Object.keys(filterCountriesList).length > 0) {
+        countriesLoc.insertAdjacentHTML(
+            "beforeend",
+            `<option value="" class="placeholder">Państwo</option>`
+        );
+
+        citiesLoc.insertAdjacentHTML(
+            "beforeend",
+            `<option value="" class="placeholder">Miasto</option>`
+        );
+
+        function compare(a, b) {
+            return a.city.localeCompare(b.city);
         }
 
-        Object.keys(filterObj).length === 0;
+        for (let key in filterCountriesList) {
+            filterCountriesList[key].sort(compare);
+        }
 
-        sliderOne.value = filterMinSalary;
-        sliderTwo.value = filterMaxSalary;
-        sliderOne.min = filterMinSalary;
-        sliderTwo.min = filterMinSalary;
-        sliderOne.max = filterMaxSalary;
-        sliderTwo.max = filterMaxSalary;
-        slideOne();
-        slideTwo();
-    };
+        filterCountriesList = Object.keys(filterCountriesList)
+            .sort()
+            .reduce((accumulator, key) => {
+                accumulator[key] = filterCountriesList[key];
+                return accumulator;
+            }, {});
 
-// double range slider
+        let allCitiesObj = [];
+        for (let key in filterCountriesList) {
+            countriesLoc.insertAdjacentHTML(
+                "beforeend",
+                `<option value="${key}">${key}</option>`
+            );
+            allCitiesObj = allCitiesObj.concat(filterCountriesList[key]);
+        }
 
-let minGap = 0;
+        let allCitiesArray = [];
+        allCitiesObj.forEach((el) => {
+            allCitiesArray.push(el.city);
+        });
 
-function slideOne() {
-    if (parseInt(sliderTwo.value) - parseInt(sliderOne.value) <= minGap) {
-        sliderOne.value = parseInt(sliderTwo.value) - minGap;
+        allCitiesArray.sort(function (a, b) {
+            return a.localeCompare(b);
+        });
+
+        allCitiesArray.forEach(function (el) {
+            citiesLoc.insertAdjacentHTML(
+                "beforeend",
+                `<option value="${el}" class="active">${el} </option>`
+            );
+        });
     }
-    displayValOne.textContent = sliderOne.value;
-    fillColor();
-}
 
-function slideTwo() {
-    if (parseInt(sliderTwo.value) - parseInt(sliderOne.value) <= minGap) {
-        sliderTwo.value = parseInt(sliderOne.value) + minGap;
-    }
-    displayValTwo.textContent = sliderTwo.value;
-    fillColor();
-}
+    sliderOne.min = filterMinSalary.toString();
+    sliderTwo.min = filterMinSalary.toString();
+    sliderOne.max = filterMaxSalary.toString();
+    sliderTwo.max = filterMaxSalary.toString();
+    sliderOne.value = filterMinSalary.toString();
+    sliderTwo.value = filterMaxSalary.toString();
+    slideOne();
+    slideTwo();
+};
 
-function fillColor() {
-    percent1 =
-        ((sliderOne.value - sliderOne.min) / (sliderOne.max - sliderOne.min)) *
-        100;
-    percent2 =
-        ((sliderTwo.value - sliderOne.min) / (sliderOne.max - sliderOne.min)) *
-        100;
-    sliderTrack.style.background = `linear-gradient(to right, #dadae5 ${percent1}%, #fe7320ff ${percent1}%, #fe7320ff ${percent2}%, #dadae5 ${percent2}%)`;
-}
+// filter the data to create FILTERED OBJECTS ARRAY ///////////////////////////////
 
-slideOne();
-slideTwo();
-
-const getFilteredData = () => {
+const createFilteredRecordsArray = () => {
     const branchesChildrenLoc = document.querySelectorAll(".branches option");
     const jobFormChildrenLoc = document.querySelectorAll(".job-form option");
     const jobTypeChildrenLoc = document.querySelectorAll(".job-type option");
@@ -735,9 +476,11 @@ const getFilteredData = () => {
     const countriesChildrenLoc = document.querySelectorAll(".countries option");
     const citiesChildrenLoc = document.querySelectorAll(".cities option");
 
-    // create filter Object (3 - put selected options to Object) ///////////////////////////////////////////////////////   3
+    let filteredRecordsArray = allRecordsArray;
 
-    filterObj = {};
+    console.log(allRecordsArray);
+
+    // selectedBranches ////////////////
 
     let selectedBranches = Array.from(branchesChildrenLoc)
         .filter(function (elem) {
@@ -747,6 +490,33 @@ const getFilteredData = () => {
             return elem.value;
         });
 
+    console.log(selectedBranches);
+
+    let filteredRecordsArray_1 = [];
+
+    if (selectedBranches.length !== 0) {
+        filteredRecordsArray.forEach((el, index) => {
+            let addFlag = false;
+
+            selectedBranches.forEach((selectedFiltr) => {
+                if (el.branche === selectedFiltr) {
+                    addFlag = true;
+                }
+            });
+
+            if (addFlag) {
+                console.log(index);
+                filteredRecordsArray_1.push(el);
+            }
+        });
+    } else {
+        filteredRecordsArray_1 = filteredRecordsArray;
+    }
+
+    console.log(filteredRecordsArray_1);
+
+    // selectedJobForms ////////////////
+
     let selectedJobForms = Array.from(jobFormChildrenLoc)
         .filter(function (elem) {
             return elem.selected;
@@ -755,7 +525,36 @@ const getFilteredData = () => {
             return elem.value;
         });
 
-    let selectedJobTypes = Array.from(jobTypeChildrenLoc)
+    console.log(selectedJobForms);
+
+    let filteredRecordsArray_2 = [];
+
+    if (selectedJobForms.length !== 0) {
+        filteredRecordsArray_1.forEach((el, index) => {
+            if (el.jobForm) {
+                let addFlag = false;
+
+                selectedJobForms.forEach((selectedFiltr) => {
+                    if (el.jobForm.indexOf(selectedFiltr) !== -1) {
+                        addFlag = true;
+                    }
+                });
+
+                if (addFlag) {
+                    console.log(index);
+                    filteredRecordsArray_2.push(el);
+                }
+            }
+        });
+    } else {
+        filteredRecordsArray_2 = filteredRecordsArray_1;
+    }
+
+    console.log(filteredRecordsArray_2);
+
+    // selectedJobTypes////////////////
+
+    let selectedjobTypes = Array.from(jobTypeChildrenLoc)
         .filter(function (elem) {
             return elem.selected;
         })
@@ -763,7 +562,34 @@ const getFilteredData = () => {
             return elem.value;
         });
 
-    let selectedLang = Array.from(langChildrenLoc)
+    console.log(selectedjobTypes);
+
+    let filteredRecordsArray_3 = [];
+
+    if (selectedjobTypes.length !== 0) {
+        filteredRecordsArray_2.forEach((el, index) => {
+            let addFlag = false;
+
+            selectedjobTypes.forEach((selectedFiltr) => {
+                if (el.jobType === selectedFiltr) {
+                    addFlag = true;
+                }
+            });
+
+            if (addFlag) {
+                console.log(index);
+                filteredRecordsArray_3.push(el);
+            }
+        });
+    } else {
+        filteredRecordsArray_3 = filteredRecordsArray_2;
+    }
+
+    console.log(filteredRecordsArray_3);
+
+    // selectedLangs ////////////////
+
+    let selectedLangs = Array.from(langChildrenLoc)
         .filter(function (elem) {
             return elem.selected;
         })
@@ -771,117 +597,311 @@ const getFilteredData = () => {
             return elem.value;
         });
 
-    let selectedCountry = [];
-    if (locationMarkLoc.checked) {
-        selectedCountry = Array.from(countriesChildrenLoc)
-            .filter(function (elem) {
-                return elem.selected;
-            })
-            .map(function (elem) {
-                return elem.value;
+    console.log(selectedLangs);
+
+    let filteredRecordsArray_4 = [];
+
+    if (selectedLangs.length !== 0) {
+        filteredRecordsArray_3.forEach((el, index) => {
+            let addFlag = false;
+
+            selectedLangs.forEach((selectedFiltr) => {
+                if (el.lang === selectedFiltr) {
+                    addFlag = true;
+                }
             });
+
+            if (addFlag) {
+                console.log(index);
+                filteredRecordsArray_4.push(el);
+            }
+        });
+    } else {
+        filteredRecordsArray_4 = filteredRecordsArray_3;
     }
 
-    let selectedCity = [];
-    if (locationMarkLoc.checked) {
-        selectedCity = Array.from(citiesChildrenLoc)
-            .filter(function (elem) {
-                return elem.selected;
-            })
-            .map(function (elem) {
-                return elem.value;
-            });
-    }
+    console.log(filteredRecordsArray_4);
 
-    let selectedLati;
-    let selectedLongi;
-    if (selectedCity[0]) {
-        selectedLati = filterCountriesList[selectedCountry[0]].find(
-            (el) => el.city === selectedCity[0]
-        ).lati;
-
-        selectedLongi = filterCountriesList[selectedCountry[0]].find(
-            (el) => el.city === selectedCity[0]
-        ).longi;
-    }
-
-    let selectedDistance = 0;
-    if (locationMarkLoc.checked) {
-        selectedDistance = parseInt(locationDotLoc.value);
-    }
-
-    let selectedRemote = remoteLoc.checked;
-    let selectedRelocation = relocationLoc.checked;
+    // selectedSalary ////////////////
 
     let selectedValOne;
     let selectedValTwo;
     if (salaryMarkLoc.checked) {
-        selectedValOne = displayValOne.innerText;
-        selectedValTwo = displayValTwo.innerText;
+        selectedValOne = parseInt(displayValOne.innerText);
+        selectedValTwo = parseInt(displayValTwo.innerText);
     }
+    console.log(selectedValOne);
+    console.log(selectedValTwo);
 
-    filterObj.branchesFiltr = selectedBranches;
-    filterObj.jobFormsFiltr = selectedJobForms;
-    filterObj.jobTypesFiltr = selectedJobTypes;
-    filterObj.langsFiltr = selectedLang;
-    filterObj.remoteFiltr = selectedRemote;
-    filterObj.relocationFiltr = selectedRelocation;
-    filterObj.salary = [selectedValOne, selectedValTwo];
-    filterObj.searchText = searchInputLoc.value;
-    filterObj.countriesFiltr = selectedCountry;
-    filterObj.citiesFiltr = selectedCity;
-    filterObj.distanceFiltr = selectedDistance;
-    filterObj.latiFiltr = selectedLati;
-    filterObj.longiFiltr = selectedLongi;
+    let filteredRecordsArray_5 = [];
 
-    // reset initialvalue
-    apiPage = 1;
-    apiDataLength = 0;
-    recordsNumber = 0;
-    getAPIPage(apiPage, filterObj);
-};
+    if (salaryMarkLoc.checked) {
+        filteredRecordsArray_4.forEach((el, index) => {
+            let addFlag = false;
 
-searchBtn.addEventListener("click", getFilteredData);
+            if (el.visibleRate) {
+                if (el.salaryTo && el.salaryFrom) {
+                    if (
+                        el.salaryTo >= selectedValOne &&
+                        el.salaryFrom <= selectedValTwo
+                    ) {
+                        addFlag = true;
+                    }
+                }
+                if (el.salaryTo && !el.salaryFrom) {
+                    if (el.salaryTo >= selectedValOne) {
+                        addFlag = true;
+                    }
+                }
+                if (!el.salaryTo && el.salaryFrom) {
+                    if (el.salaryFrom <= selectedValTwo) {
+                        addFlag = true;
+                    }
+                }
+            }
 
-const clearFilters = () => {
-    searchInputLoc.value = "";
-    window.location.reload();
-};
-
-clearFiltersLoc.addEventListener("click", clearFilters);
-
-clearFilterLoc.forEach((elemFiltr) => {
-    elemFiltr.addEventListener("click", () => {
-        let optArray =
-            elemFiltr.previousElementSibling.querySelectorAll("option");
-        optArray.forEach((elOpt) => {
-            if (elOpt.selected) {
-                elOpt.selected = false;
+            if (addFlag) {
+                console.log(index);
+                filteredRecordsArray_5.push(el);
             }
         });
-    });
-});
-
-dropDownLoc.addEventListener("click", () => {
-    dropDownBtnLoc.classList.toggle("up");
-    if (dropDownFilterLoc.classList.contains("show")) {
-        dropDownFilterLoc.classList.remove("show");
-        dropDownFilterLoc.style.maxHeight = String(0) + "px";
-        moreFiltersLoc.classList.remove("hide");
-        lessFiltersLoc.classList.remove("show");
     } else {
-        dropDownFilterLoc.classList.add("show");
-        dropDownFilterLoc.style.maxHeight =
-            String(filterListMaxHeight + 200) + "px";
-        moreFiltersLoc.classList.add("hide");
-        lessFiltersLoc.classList.add("show");
+        filteredRecordsArray_5 = filteredRecordsArray_4;
     }
-});
 
-locationMarkLoc.checked = false;
-locationDotLoc.disabled = true;
-countriesLoc.disabled = true;
-citiesLoc.disabled = true;
+    console.log(filteredRecordsArray_5);
+
+    // selectedCountry ////////////////
+
+    let selectedCountry = [];
+
+    if (locationMarkLoc.checked) {
+        selectedCountry = Array.from(countriesChildrenLoc)
+            .filter(function (elem) {
+                if (elem.value) {
+                    return elem.selected;
+                }
+            })
+            .map(function (elem) {
+                if (elem.value) {
+                    return elem.value;
+                }
+            });
+    }
+
+    console.log(selectedCountry);
+
+    let filteredRecordsArray_6 = [];
+
+    if (locationMarkLoc.checked) {
+        if (selectedCountry.length) {
+            filteredRecordsArray_5.forEach((el, index) => {
+                let addFlag = false;
+
+                selectedCountry.forEach((selectedFiltr) => {
+                    if (el.country === selectedFiltr) {
+                        addFlag = true;
+                    }
+                });
+
+                if (addFlag) {
+                    console.log(index);
+                    filteredRecordsArray_6.push(el);
+                }
+            });
+        } else {
+            filteredRecordsArray_6 = filteredRecordsArray_5;
+        }
+    } else {
+        filteredRecordsArray_6 = filteredRecordsArray_5;
+    }
+
+    console.log(filteredRecordsArray_6);
+
+    // selectedCity & selectedDistance ////////////////
+
+    let selectedCity = [];
+
+    if (locationMarkLoc.checked) {
+        selectedCity = Array.from(citiesChildrenLoc)
+            .filter(function (elem) {
+                if (elem.value) {
+                    return elem.selected;
+                }
+            })
+            .map(function (elem) {
+                if (elem.value) {
+                    return elem.value;
+                }
+            });
+    }
+
+    console.log(selectedCity);
+
+    let filteredRecordsArray_7 = [];
+
+    if (locationMarkLoc.checked) {
+        if (selectedCity.length) {
+            let selectedDistance = 0;
+
+            selectedDistance = parseInt(locationDotLoc.value);
+
+            console.log(selectedDistance);
+
+            let lati;
+            let longi;
+            let min_lati;
+            let max_lati;
+            let min_longi;
+            let max_longi;
+
+            filteredRecordsArray_6.forEach((el, index) => {
+                if (el.city === selectedCity[0]) {
+                    lati = el.lati;
+                    longi = el.longi;
+                    console.log(index);
+                    console.log(lati);
+                    console.log(longi);
+
+                    min_lati = lati - selectedDistance * 0.009044;
+                    max_lati = lati + selectedDistance * 0.009044;
+                    min_longi =
+                        longi -
+                        (selectedDistance * 0.0089831) /
+                            Math.cos((lati * Math.PI) / 180);
+                    max_longi =
+                        longi +
+                        (selectedDistance * 0.0089831) /
+                            Math.cos((lati * Math.PI) / 180);
+                    console.log(min_lati);
+                    console.log(max_lati);
+                    console.log(min_longi);
+                    console.log(max_longi);
+                }
+            });
+
+            filteredRecordsArray_6.forEach((el, index) => {
+                let addFlag = false;
+
+                if (
+                    el.lati <= max_lati &&
+                    el.lati >= min_lati &&
+                    el.longi <= max_longi &&
+                    el.longi >= min_longi
+                ) {
+                    addFlag = true;
+                }
+
+                if (addFlag) {
+                    console.log(index);
+                    filteredRecordsArray_7.push(el);
+                }
+            });
+        } else {
+            filteredRecordsArray_7 = filteredRecordsArray_6;
+        }
+    } else {
+        filteredRecordsArray_7 = filteredRecordsArray_6;
+    }
+
+    console.log(filteredRecordsArray_7);
+
+    // selectedRemote ////////////////
+
+    let filteredRecordsArray_8 = [];
+
+    if (remoteLoc.checked) {
+        filteredRecordsArray_7.forEach((el, index) => {
+            let addFlag = false;
+
+            if (el.remote) {
+                addFlag = true;
+            }
+
+            if (addFlag) {
+                console.log(index);
+                filteredRecordsArray_8.push(el);
+            }
+        });
+    } else {
+        filteredRecordsArray_8 = filteredRecordsArray_7;
+    }
+
+    console.log(filteredRecordsArray_8);
+
+    // selectedRelocation ////////////////
+
+    let filteredRecordsArray_9 = [];
+
+    if (relocationLoc.checked) {
+        filteredRecordsArray_8.forEach((el, index) => {
+            let addFlag = false;
+
+            if (el.relocation) {
+                addFlag = true;
+            }
+
+            if (addFlag) {
+                console.log(index);
+                filteredRecordsArray_9.push(el);
+            }
+        });
+    } else {
+        filteredRecordsArray_9 = filteredRecordsArray_8;
+    }
+
+    console.log(filteredRecordsArray_9);
+
+    // searchText ////////////////
+
+    filteredRecordsArray_10 = [];
+
+    let searchText = searchInputLoc.value;
+
+    if (searchText) {
+        filteredRecordsArray_9.forEach((el, index) => {
+            let addFlag = false;
+
+            let position;
+
+            el.description.forEach(function (elem) {
+                if (elem.value && elem.field_id !== "geolocation") {
+                    position = elem.value
+                        .toLowerCase()
+                        .search(searchText.toLowerCase());
+                    if (position !== -1) {
+                        addFlag = true;
+                    }
+                }
+            });
+
+            position = el.name.toLowerCase().search(searchText.toLowerCase());
+            if (position !== -1) {
+                addFlag = true;
+            }
+
+            if (addFlag) {
+                console.log(index);
+                filteredRecordsArray_10.push(el);
+            }
+        });
+    } else {
+        filteredRecordsArray_10 = filteredRecordsArray_9;
+    }
+
+    console.log(filteredRecordsArray_10);
+
+    // recordsArray = filteredRecordsArray_10;
+    recordsNumber = filteredRecordsArray_10.length;
+    summariseDownload(recordsNumber);
+    createRecordBoxes(filteredRecordsArray_10, 0, recordsOnPage);
+    setPages(recordsNumber);
+    filtersON = true;
+};
+
+searchBtn.addEventListener("click", createFilteredRecordsArray);
+
+// COUNTRY & CITY LISTENER /////////////////////////////////////////////////////////////
 
 locationMarkLoc.addEventListener("change", function (e) {
     if (e.target.checked) {
@@ -903,11 +923,9 @@ locationMarkLoc.addEventListener("change", function (e) {
     }
 });
 
-function slideThree() {
-    displayValThree.textContent = locationDotLoc.value;
+function slideDistance() {
+    displayValDistance.textContent = locationDotLoc.value;
 }
-
-locationDotLoc.value = 0;
 
 const activateCities = () => {
     citiesLoc.querySelectorAll("option").forEach((el) => {
@@ -970,5 +988,146 @@ citiesLoc.addEventListener("change", function () {
         locationSliderLoc.classList.remove("unactive");
         locationValuesLoc.classList.remove("unactive");
         locationDotLoc.disabled = false;
+    }
+});
+
+// SALARY LISTENER ////////////////////////////////////////////////////////////////////
+
+let minGap = 0;
+
+function slideOne() {
+    if (parseInt(sliderTwo.value) - parseInt(sliderOne.value) <= minGap) {
+        sliderOne.value = parseInt(sliderTwo.value) - minGap;
+    }
+    displayValOne.textContent = sliderOne.value;
+
+    if (sliderOne.value === sliderTwo.value) {
+        console.log("HHHHH");
+        sliderOne.style.zIndex = "1";
+    } else {
+        sliderOne.style.zIndex = "0";
+    }
+
+    fillColor();
+}
+
+function slideTwo() {
+    if (parseInt(sliderTwo.value) - parseInt(sliderOne.value) <= minGap) {
+        sliderTwo.value = parseInt(sliderOne.value) + minGap;
+    }
+    displayValTwo.textContent = sliderTwo.value;
+    if (displayValTwo.textContent === "100000") {
+        salaryMarkLoc.disabled = true;
+        displayValOne.textContent = "";
+        displayValTwo.textContent = "";
+        pauseLoc.textContent = "";
+    }
+    fillColor();
+}
+
+function fillColor() {
+    percent1 =
+        ((sliderOne.value - sliderOne.min) / (sliderOne.max - sliderOne.min)) *
+        100;
+    percent2 =
+        ((sliderTwo.value - sliderOne.min) / (sliderOne.max - sliderOne.min)) *
+        100;
+    sliderTrack.style.background = `linear-gradient(to right, #dadae5 ${percent1}%, #fe7320ff ${percent1}%, #fe7320ff ${percent2}%, #dadae5 ${percent2}%)`;
+}
+
+sliderOne.value = filterMaxSalary.toString();
+sliderTwo.value = filterMinSalary.toString();
+
+salaryMarkLoc.addEventListener("change", function (e) {
+    if (e.target.checked) {
+        salarySliderLoc.classList.remove("unactive");
+        salaryValuesLoc.classList.remove("unactive");
+        sliderOne.disabled = false;
+        sliderTwo.disabled = false;
+    } else {
+        salarySliderLoc.classList.add("unactive");
+        salaryValuesLoc.classList.add("unactive");
+        sliderOne.disabled = true;
+        sliderTwo.disabled = true;
+    }
+});
+
+// set & change PAGE //////////////////////////////////////////////////////////
+
+const changePage = (pageBtn) => {
+    pageButtonsLoc.forEach((el) => {
+        el.classList.remove("active");
+    });
+    pageBtn.classList.add("active");
+    let firstRecord =
+        recordsOnPage * parseInt(pageBtn.innerText) - recordsOnPage;
+    let lastRecord = recordsOnPage * parseInt(pageBtn.innerText);
+    filtersON
+        ? createRecordBoxes(filteredRecordsArray_10, firstRecord, lastRecord)
+        : createRecordBoxes(allRecordsArray, firstRecord, lastRecord);
+};
+
+const setPages = (recordsNumber) => {
+    let pagesQuantity = Math.ceil(recordsNumber / recordsOnPage);
+
+    pagesSwitchLoc.replaceChildren();
+
+    for (n = 1; n <= pagesQuantity; n++) {
+        if (n === 1) {
+            pagesSwitchLoc.insertAdjacentHTML(
+                "beforeend",
+                `<div class="page active">${n}</div>`
+            );
+        } else {
+            pagesSwitchLoc.insertAdjacentHTML(
+                "beforeend",
+                `<div class="page">${n}</div>`
+            );
+        }
+    }
+
+    pageButtonsLoc = document.querySelectorAll(".page");
+    pageButtonsLoc.forEach((el) => {
+        el.addEventListener("click", (e) => {
+            changePage(e.target);
+        });
+    });
+};
+
+// change RECORDS QUANTITY ON PAGE //////////////////////////////////////////////////
+
+recordsOnPageLoc.forEach((el) => {
+    el.addEventListener("click", (e) => {
+        recordsOnPageLoc.forEach((elem) => {
+            elem.classList.remove("active");
+        });
+        document
+            .querySelector(`[data-value='${e.target.dataset.value}']`)
+            .classList.add("active");
+
+        recordsOnPage = parseInt(e.target.dataset.value);
+
+        filtersON
+            ? createRecordBoxes(filteredRecordsArray_10, 0, recordsOnPage)
+            : createRecordBoxes(allRecordsArray, 0, recordsOnPage);
+        setPages(recordsNumber);
+    });
+});
+
+// show & hide MORE FILTERS //////////////////////////////////////////////////
+
+dropDownLoc.addEventListener("click", () => {
+    dropDownBtnLoc.classList.toggle("up");
+    if (dropDownFilterLoc.classList.contains("show")) {
+        dropDownFilterLoc.classList.remove("show");
+        dropDownFilterLoc.style.maxHeight = String(0) + "px";
+        moreFiltersLoc.classList.remove("hide");
+        lessFiltersLoc.classList.remove("show");
+    } else {
+        dropDownFilterLoc.classList.add("show");
+        dropDownFilterLoc.style.maxHeight =
+            String(filterListMaxHeight + 200) + "px";
+        moreFiltersLoc.classList.add("hide");
+        lessFiltersLoc.classList.add("show");
     }
 });
