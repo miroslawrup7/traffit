@@ -1,6 +1,7 @@
 const recNumLoc = document.querySelector(".records-number");
 const noResultsLoc = document.querySelector(".no-results");
 const resultsLoc = document.querySelector(".results");
+const awardedResultsLoc = document.querySelector(".awarded");
 const pagesContainer = document.querySelector(".pages-container");
 const pagesSwitchLoc = document.querySelector(".pages");
 let pageButtonsLoc = document.querySelectorAll(".page");
@@ -74,6 +75,7 @@ let filtersON = false;
 let filteredRecordsArray_10 = [];
 
 searchInputLoc.value = "";
+recordsOnPageLoc.value = 20;
 
 locationMarkLoc.checked = false;
 locationDotLoc.disabled = true;
@@ -173,6 +175,7 @@ const reworkData = (rawAPIArray) => {
             lati: parseFloat(parsedJobLocation.latitude),
             longi: parseFloat(parsedJobLocation.longitude),
             description: el.advert.values,
+            awarded: el.awarded,
         });
 
         createDataForFilters(
@@ -332,6 +335,128 @@ const createRecordBoxes = (recordsArray, firstRecordNumber, recordsOnPage) => {
     }
 };
 
+// create RECORDS BOXES ///////////////////////////////////////////////
+
+const createAwardedRecordBoxes = (recordsArray) => {
+    console.log(recordsArray);
+
+    awardedResultsLoc.replaceChildren();
+
+    let awardedRecordsArray = recordsArray.filter((elem) => {
+        return elem.awarded;
+    });
+
+    console.log(awardedRecordsArray);
+
+    for (i = firstRecordNumber; i < 10; i++) {
+        if (awardedRecordsArray[i]) {
+            let borderColorClass = "";
+            let textColorClass = "";
+
+            if (awardedRecordsArray[i].recruitmentType === "PT") {
+                borderColorClass = "pt-border";
+                textColorClass = "pt-text";
+            }
+            if (awardedRecordsArray[i].recruitmentType === "RS") {
+                borderColorClass = "rs-border";
+                textColorClass = "rs-text";
+            }
+            if (awardedRecordsArray[i].recruitmentType === "WEW") {
+                borderColorClass = "wew-border";
+                textColorClass = "wew-text";
+            }
+
+            let formaZatrudnienia = "";
+
+            if (awardedRecordsArray[i].jobForm) {
+                awardedRecordsArray[i].jobForm.forEach(function (elem) {
+                    formaZatrudnienia =
+                        formaZatrudnienia + "<p>" + elem + "</p>";
+                });
+            }
+
+            awardedResultsLoc.insertAdjacentHTML(
+                "beforeend",
+                `<a href="${
+                    awardedRecordsArray[i].url
+                }" target="_blank"><div class="result ${borderColorClass}">
+            <div class="top">
+                <div class="top-left">
+                    <div class="lang">
+                        <p>${awardedRecordsArray[i].lang}</p>
+                    </div>
+                    <div class="branche-name">
+                        <div class="branche">${
+                            awardedRecordsArray[i].branche
+                                ? awardedRecordsArray[i].branche
+                                : ""
+                        }</div>
+                        <div class="name ${textColorClass}">${
+                    awardedRecordsArray[i].name
+                }</div>
+                    </div>
+                </div>
+                <div class="top-right">
+                    ${
+                        awardedRecordsArray[i].jobType
+                            ? "<div class='jobtype'>" +
+                              awardedRecordsArray[i].jobType +
+                              "</div>"
+                            : ""
+                    }
+                    ${
+                        awardedRecordsArray[i].visibleRate
+                            ? awardedRecordsArray[i].salaryFrom &&
+                              awardedRecordsArray[i].salaryTo
+                                ? "<div class='salary'>" +
+                                  awardedRecordsArray[i].salaryFrom +
+                                  " - " +
+                                  awardedRecordsArray[i].salaryTo +
+                                  "</div>"
+                                : ""
+                            : ""
+                    }
+                </div>
+            </div>
+
+            <div class="bottom">
+                <div class="bottom-left">
+                    <div class="city"><img src="./img/location_dot.svg">${
+                        awardedRecordsArray[i].city
+                    }</div>
+                    ${
+                        awardedRecordsArray[i].remote
+                            ? "<div class='remote'>zdalna</div>"
+                            : ""
+                    }
+                    ${
+                        awardedRecordsArray[i].relocation
+                            ? "<div class='relocation'>relocation</div>"
+                            : ""
+                    }
+                </div>
+                    <div class="bottom-right">
+                        <div class="employmentform">${formaZatrudnienia}</div>
+                    </div>
+                </div>
+
+                <div class="ribbon-wrap">
+                        <div class="ribbon">
+                            <img src="./img/star.svg" alt="">
+                            <img src="./img/star.svg" alt="">
+                            <img src="./img/star.svg" alt="">
+                        </div>
+                    </div>
+            </div>
+
+            
+
+        </div></a>`
+            );
+        }
+    }
+};
+
 // gets DATA FROM API ///////////////////////////////////////////////
 
 const getAPI = (apiPage) => {
@@ -361,6 +486,7 @@ const loopOnAPI = (jsonData) => {
         recordsNumber = rawAPIArray.length;
         summariseDownload(recordsNumber);
         createRecordBoxes(allRecordsArray, firstRecordNumber, recordsOnPage);
+        createAwardedRecordBoxes(allRecordsArray);
         setPages(recordsNumber);
         createFilterLists();
         dropDownBtnStart();

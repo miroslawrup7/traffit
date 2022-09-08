@@ -37,29 +37,32 @@ main {
     margin: 0 auto;
 }
 
-.pt-border {
-    border: 2px solid $color-rec-1;
+.result {
+    &.pt-border {
+        border: 2px solid $color-rec-1;
+    }
+    
+    .pt-text {
+        color: $color-rec-1;
+    }
+    
+    &.rs-border {
+        border: 2px solid $color-rec-2;
+    }
+    
+    .rs-text {
+        color: $color-rec-2;
+    }
+    
+    &.wew-border {
+        border: 2px solid $color-rec-3;
+    }
+    
+    .wew-text {
+        color: $color-rec-3;
+    }
 }
 
-.pt-text {
-    color: $color-rec-1;
-}
-
-.rs-border {
-    border: 2px solid $color-rec-2;
-}
-
-.rs-text {
-    color: $color-rec-2;
-}
-
-.wew-border {
-    border: 2px solid $color-rec-3;
-}
-
-.wew-text {
-    color: $color-rec-3;
-}
 
 .unactive {
     opacity: 0.3;
@@ -525,6 +528,58 @@ main {
     margin: 25px 25px 30px 25px;
 }
 
+.awarded {
+    margin: 25px 25px 50px 25px; 
+    .result {
+        .top {
+            .branche {
+                margin-left: 10px;
+            }
+        }
+        .ribbon-wrap {
+            width: 75px;
+            height: 75px;
+            
+            overflow: hidden;
+            position: absolute;
+            border-radius: 2px;
+            top: -8px;
+            left: -8px;
+            .ribbon {
+                width: 125px;
+                font-size: 5px;
+                text-align: center;
+                padding: 2px 0;
+                background: #ff2166;
+                color: #fff;
+                position: absolute;
+                transform: rotate(-45deg);
+                left: -31px;
+                top: 23px;
+                img {
+                    height: 11px;
+                }
+            }
+            &::before, &::after {
+                content: '';
+                width: 10px;
+                height: 10px;
+                background: #bb1c4e;
+                position: absolute;
+                z-index: -1;
+            }
+            &::before {
+                top: 0;
+                right: 0;
+            }
+            &::after {
+                bottom: 0;
+                left: 0;
+            }
+        }
+    }
+}
+
 .result {
     background-color: #FFFFFF;
     margin: 20px;
@@ -533,6 +588,7 @@ main {
     border-top-right-radius: 15px;
     box-shadow: 0 0 25px 2px rgb(51 51 51 / 20%);
     position: relative;
+    border: solid white 2px;
     .top {
         min-height: 50px;
         display: flex;
@@ -596,8 +652,8 @@ main {
             justify-content: left;
             align-items: center;
             .jobtype {
-                font-weight: 300;
-                font-size: 14px;
+                font-weight: 400;
+                font-size: 12px;
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -610,8 +666,8 @@ main {
                 background-color: #229dfb1f;
             }
             .salary {
-                font-weight: 300;
-                font-size: 14px;
+                font-weight: 400;
+                font-size: 12px;
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -650,8 +706,8 @@ main {
             }
             .remote {
                 padding: 0 5px;
-                font-weight: 300;
-                font-size: 14px;
+                font-weight: 400;
+                font-size: 12px;
                 line-height: 1.2em;
                 margin: 0 10px;
                 color: black;
@@ -664,8 +720,8 @@ main {
             }
             .relocation {
                 padding: 0 5px;
-                font-weight: 300;
-                font-size: 14px;
+                font-weight: 400;
+                font-size: 12px;
                 line-height: 1.2em;
                 margin: 0 10px;
                 color: black;
@@ -685,8 +741,8 @@ main {
                 display: flex;
                 p {
                     padding: 0 5px;
-                    font-weight: 300;
-                    font-size: 14px;
+                    font-weight: 400;
+                    font-size: 12px;
                     line-height: 1.2em;
                     margin: 0 10px;
                     color: black;
