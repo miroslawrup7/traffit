@@ -1,7 +1,8 @@
 const recNumLoc = document.querySelector(".records-number");
 const noResultsLoc = document.querySelector(".no-results");
 const resultsLoc = document.querySelector(".results");
-const pagesSwitchLoc = document.querySelector(".pages-container");
+const pagesContainer = document.querySelector(".pages-container");
+const pagesSwitchLoc = document.querySelector(".pages");
 let pageButtonsLoc = document.querySelectorAll(".page");
 
 const dropDownFilterLoc = document.querySelector(".drop-down-filters");
@@ -10,7 +11,7 @@ const dropDownBtnLoc = document.querySelector(".drop-down-btn img");
 const moreFiltersLoc = document.querySelector(".more-filters");
 const lessFiltersLoc = document.querySelector(".less-filters");
 
-const recordsOnPageLoc = document.querySelectorAll(".recordsOnPage span");
+const recordsOnPageLoc = document.querySelector(".records-on-page");
 
 const branchesLoc = document.querySelector(".branches");
 const jobFormLoc = document.querySelector(".job-form");
@@ -47,8 +48,6 @@ const relocationLoc = document.querySelector("#relocation");
 const searchInputLoc = document.querySelector(".search-input input");
 
 const searchBtn = document.querySelector(".search-btn");
-
-const pagesContainerLoc = document.querySelector(".pages-container");
 
 const clearFiltersLoc = document.querySelector(".clear-filters");
 const clearFilterLoc = document.querySelectorAll(".lists .list .clear-list");
@@ -225,6 +224,10 @@ const dropDownBtnStart = () => {
     dropDownLoc.classList.add("active");
 };
 
+const pagesContainerStart = () => {
+    pagesContainer.classList.add("active");
+};
+
 // create RECORDS BOXES ///////////////////////////////////////////////
 
 const createRecordBoxes = (recordsArray, firstRecordNumber, recordsOnPage) => {
@@ -361,6 +364,7 @@ const loopOnAPI = (jsonData) => {
         setPages(recordsNumber);
         createFilterLists();
         dropDownBtnStart();
+        pagesContainerStart();
     }
 };
 
@@ -1068,22 +1072,13 @@ const setPages = (recordsNumber) => {
 
 // change RECORDS QUANTITY ON PAGE //////////////////////////////////////////////////
 
-recordsOnPageLoc.forEach((el) => {
-    el.addEventListener("click", (e) => {
-        recordsOnPageLoc.forEach((elem) => {
-            elem.classList.remove("active");
-        });
-        document
-            .querySelector(`[data-value='${e.target.dataset.value}']`)
-            .classList.add("active");
+recordsOnPageLoc.addEventListener("change", (e) => {
+    recordsOnPage = parseInt(e.target.value);
 
-        recordsOnPage = parseInt(e.target.dataset.value);
-
-        filtersON
-            ? createRecordBoxes(filteredRecordsArray_10, 0, recordsOnPage)
-            : createRecordBoxes(allRecordsArray, 0, recordsOnPage);
-        setPages(recordsNumber);
-    });
+    filtersON
+        ? createRecordBoxes(filteredRecordsArray_10, 0, recordsOnPage)
+        : createRecordBoxes(allRecordsArray, 0, recordsOnPage);
+    setPages(recordsNumber);
 });
 
 const clearFilters = () => {

@@ -202,32 +202,30 @@ main {
                 opacity: 1;
             }
         }
-        .recordsOnPage {
-            display: flex;
-            align-items: center;
-            span {
-                opacity: 0.7;
-                min-width: 25px;
-                padding: 0 1px;
-                cursor: pointer;
-                text-align: center;
-                &.active {
-                    color: $font-color;
-                    font-weight: bold;
-                    // font-size: 14px;
-                    opacity: 1;
+        // .recordsOnPage {
+        //     display: flex;
+        //     align-items: center;
+        //     span {
+        //         opacity: 0.7;
+        //         min-width: 25px;
+        //         padding: 0 1px;
+        //         cursor: pointer;
+        //         text-align: center;
+        //         &.active {
+        //             color: $font-color;
+        //             font-weight: bold;
+        //             // font-size: 14px;
+        //             opacity: 1;
                     
-                }
-                &:hover {
-                    // font-size: 14px;
-                    opacity: 1;
-                }
-            }
+        //         }
+        //         &:hover {
+        //             // font-size: 14px;
+        //             opacity: 1;
+        //         }
+        //     }
 
-        }
-        .records-number {
-            min-width: 135px;
-        }
+        // }
+
     }
     .drop-down-filters {
         max-height: 0;
@@ -243,6 +241,7 @@ main {
         }
         .loc-and-checkboxes {
             display: flex;
+            margin-bottom: 10px;
             .loc-container {
                 display: flex;
                 flex-grow: 1;
@@ -728,32 +727,75 @@ main {
 
 .pages-container {
     display: flex;
-    justify-content: center;
-    margin-bottom: 30px;
-}
-
-.page {
-    display: inline-block;
-    border-radius: 3px;
-    border: 1px solid #b3b3b3;
-    color: #505050;
-    text-align: center;
-    line-height: 30px;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    margin: 4px;
-    &.active {
-        background-color: $primary-color;
-        border: 1px solid $primary-color;
-        color: white;
+    justify-content:space-between;
+    align-items: flex-start;
+    margin: 25px 50px;
+    position: relative;
+    opacity: 0;
+    .pages {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+    }
+    
+    .page {
+        display: inline-block;
+        border-radius: 3px;
+        border: 1px solid #b3b3b3;
+        color: #505050;
+        text-align: center;
+        line-height: 30px;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        margin: 4px;
+        &.active {
+            background-color: $primary-color;
+            border: 1px solid $primary-color;
+            color: white;
+            &:hover {
+                background-color: $contrastColor;
+                border: 1px solid $contrastColor;
+            }
+        }
         &:hover {
-            background-color: $contrastColor;
-            border: 1px solid $contrastColor;
+            background-color: $primary-color-light;
         }
     }
-    &:hover {
-        background-color: $primary-color-light;
+    select.records-on-page {
+        background-color: white;
+        color: $font-color;
+        padding: 5px 0;
+        border-radius: 3px;
+        border: 1px solid $primary-color;
+        option.placeholder {
+            color: $unactiveColor
+        }
     }
+    .label {
+        position: absolute;
+        right: 0;
+        bottom: 20px;
+        font-size: 11px;
+    }
+    &.active {
+        opacity: 1;
+    }
+}
+
+select:disabled {
+    border: 1px solid $unactiveColor;
+    color: $unactiveColor;
+}
+select.cities option {
+    color: $lightColor;
+}
+
+select.cities option.active {
+    color: $font-color;
+}
+
+.records-number {
+    min-width: 135px;
 }
 
