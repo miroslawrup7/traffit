@@ -205,29 +205,6 @@ main {
                 opacity: 1;
             }
         }
-        // .recordsOnPage {
-        //     display: flex;
-        //     align-items: center;
-        //     span {
-        //         opacity: 0.7;
-        //         min-width: 25px;
-        //         padding: 0 1px;
-        //         cursor: pointer;
-        //         text-align: center;
-        //         &.active {
-        //             color: $font-color;
-        //             font-weight: bold;
-        //             // font-size: 14px;
-        //             opacity: 1;
-                    
-        //         }
-        //         &:hover {
-        //             // font-size: 14px;
-        //             opacity: 1;
-        //         }
-        //     }
-
-        // }
 
     }
     .drop-down-filters {
@@ -774,7 +751,6 @@ main {
         height: 100%;
         opacity: 0.1;
         background-size: contain;
-
     }
     img {
         width: 50%;
@@ -854,4 +830,3 @@ select.cities option.active {
 .records-number {
     min-width: 135px;
 }
-
