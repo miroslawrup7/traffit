@@ -217,8 +217,7 @@ const dropDownBtnStart = () => {
             lessFiltersLoc.classList.remove("show");
         } else {
             dropDownFilterLoc.classList.add("show");
-            dropDownFilterLoc.style.maxHeight =
-                String(filterListMaxHeight + 200) + "px";
+            dropDownFilterLoc.style.maxHeight = "1000px";
             moreFiltersLoc.classList.add("hide");
             lessFiltersLoc.classList.add("show");
         }
@@ -271,7 +270,7 @@ const createRecordBoxes = (recordsArray, firstRecordNumber, recordsOnPage) => {
                     recordsArray[i].url
                 }" target="_blank"><div class="result ${borderColorClass}">
             <div class="top">
-                <div class="top-left">
+              
                     <div class="lang"><p>${recordsArray[i].lang}</p></div>
                     <div class="branche-name">
                         <div class="branche">${
@@ -282,9 +281,18 @@ const createRecordBoxes = (recordsArray, firstRecordNumber, recordsOnPage) => {
                         <div class="name ${textColorClass}">${
                     recordsArray[i].name
                 }</div>
-                    </div>
+                   
                 </div>
-                <div class="top-right">
+              
+            </div>
+
+            <div class="bottom">
+                <div class="city-container">
+                    <div class="city"><img src="./img/location_dot.svg">${
+                        recordsArray[i].city
+                    }</div>
+                    </div>
+                    <div class="details-container">
                     ${
                         recordsArray[i].jobType
                             ? "<div class='jobtype'>" +
@@ -304,14 +312,6 @@ const createRecordBoxes = (recordsArray, firstRecordNumber, recordsOnPage) => {
                                 : ""
                             : ""
                     }
-                </div>
-            </div>
-
-            <div class="bottom">
-                <div class="bottom-left">
-                    <div class="city"><img src="./img/location_dot.svg">${
-                        recordsArray[i].city
-                    }</div>
                     ${
                         recordsArray[i].remote
                             ? "<div class='remote'>zdalna</div>"
@@ -322,12 +322,12 @@ const createRecordBoxes = (recordsArray, firstRecordNumber, recordsOnPage) => {
                             ? "<div class='relocation'>relocation</div>"
                             : ""
                     }
-                </div>
-                    <div class="bottom-right">
-                        <div class="employmentform">${formaZatrudnienia}</div>
+                    <div class="employmentform">${formaZatrudnienia}</div>
                     </div>
                 </div>
-            </div>
+                   
+                </div>
+          
 
         </div></a>`
             );
@@ -338,15 +338,11 @@ const createRecordBoxes = (recordsArray, firstRecordNumber, recordsOnPage) => {
 // create RECORDS BOXES ///////////////////////////////////////////////
 
 const createAwardedRecordBoxes = (recordsArray) => {
-    console.log(recordsArray);
-
     awardedResultsLoc.replaceChildren();
 
     let awardedRecordsArray = recordsArray.filter((elem) => {
         return elem.awarded;
     });
-
-    console.log(awardedRecordsArray);
 
     for (i = firstRecordNumber; i < 10; i++) {
         if (awardedRecordsArray[i]) {
@@ -381,7 +377,7 @@ const createAwardedRecordBoxes = (recordsArray) => {
                     awardedRecordsArray[i].url
                 }" target="_blank"><div class="result ${borderColorClass}">
             <div class="top">
-                <div class="top-left">
+               
                     <div class="lang">
                         <p>${awardedRecordsArray[i].lang}</p>
                     </div>
@@ -395,8 +391,25 @@ const createAwardedRecordBoxes = (recordsArray) => {
                     awardedRecordsArray[i].name
                 }</div>
                     </div>
-                </div>
-                <div class="top-right">
+                
+            </div>
+
+            <div class="bottom">
+                <div class="city-container">
+                    <div class="city"><img src="./img/location_dot.svg">${
+                        awardedRecordsArray[i].city
+                    }</div></div>
+                    <div class="details-container">
+                    ${
+                        awardedRecordsArray[i].remote
+                            ? "<div class='remote'>zdalna</div>"
+                            : ""
+                    }
+                    ${
+                        awardedRecordsArray[i].relocation
+                            ? "<div class='relocation'>relocation</div>"
+                            : ""
+                    }
                     ${
                         awardedRecordsArray[i].jobType
                             ? "<div class='jobtype'>" +
@@ -416,32 +429,13 @@ const createAwardedRecordBoxes = (recordsArray) => {
                                 : ""
                             : ""
                     }
-                </div>
+                    <div class="employmentform">${formaZatrudnienia}</div>
+                    </div>
+                
             </div>
 
-            <div class="bottom">
-                <div class="bottom-left">
-                    <div class="city"><img src="./img/location_dot.svg">${
-                        awardedRecordsArray[i].city
-                    }</div>
-                    ${
-                        awardedRecordsArray[i].remote
-                            ? "<div class='remote'>zdalna</div>"
-                            : ""
-                    }
-                    ${
-                        awardedRecordsArray[i].relocation
-                            ? "<div class='relocation'>relocation</div>"
-                            : ""
-                    }
-                </div>
-                    <div class="bottom-right">
-                        <div class="employmentform">${formaZatrudnienia}</div>
-                    </div>
-                </div>
-
-                <div class="ribbon-wrap">
-                        <div class="ribbon">
+            <div class="ribbon-wrap">
+                    <div class="ribbon">
                             <img src="./img/star.svg" alt="">
                             <img src="./img/star.svg" alt="">
                             <img src="./img/star.svg" alt="">
@@ -461,7 +455,8 @@ const createAwardedRecordBoxes = (recordsArray) => {
 
 const getAPI = (apiPage) => {
     const response = fetch(
-        "https://grupaprogres.traffit.com/public/job_posts/published",
+        "https://grupaprogres.traffit.com/public/job_posts/published", // deactivate in local mode
+        //"response.json" // activate in local mode
         {
             mode: "cors",
             headers: {
@@ -478,10 +473,13 @@ const getAPI = (apiPage) => {
 
 const loopOnAPI = (jsonData) => {
     if (jsonData.length > 0) {
-        rawAPIArray = rawAPIArray.concat(jsonData);
-        apiPage++;
-        createRecordsObjFromAPI(apiPage);
+        // deactivate in local mode
+        rawAPIArray = rawAPIArray.concat(jsonData); // deactivate in local mode
+        // rawAPIArray = jsonData; // activate in local mode
+        apiPage++; // deactivate in local mode
+        createRecordsObjFromAPI(apiPage); // deactivate in local mode
     } else {
+        // deactivate in local mode
         reworkData(rawAPIArray);
         recordsNumber = rawAPIArray.length;
         summariseDownload(recordsNumber);
@@ -491,7 +489,7 @@ const loopOnAPI = (jsonData) => {
         createFilterLists();
         dropDownBtnStart();
         pagesContainerStart();
-    }
+    } // deactivate in local mode
 };
 
 async function createRecordsObjFromAPI(apiPage) {
