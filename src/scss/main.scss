@@ -71,13 +71,10 @@ hr {
     }
 }
 
-
 .unactive {
     opacity: 0.3;
     filter: grayscale(100%);
 }
-
-
 
 .checkbox-container {
     margin: 10px;
@@ -187,7 +184,6 @@ hr {
             border: 2px solid $primary-color;
             cursor: pointer;
             margin: 0 20px;
-
         }
         .search-btn:hover {
             box-shadow: 2px 2px 4px rgba(0,0,0,0.2), -2px -2px 4px rgba(0,0,0,0.2)
@@ -213,7 +209,6 @@ hr {
                 opacity: 1;
             }
         }
-
     }
     .drop-down-filters {
         max-height: 0;
@@ -224,7 +219,6 @@ hr {
         }
         .salary {
             display: flex;
-            // flex-direction: column;
             margin-bottom: 20px;
         }
         .loc-and-checkboxes {
@@ -299,13 +293,11 @@ hr {
             flex-wrap: wrap;
             min-width: 100%;
             .two-lists-conatainer {
-                // border: blue solid 1px;
                 display: flex;
                 justify-content: space-around;
                 flex-wrap: wrap;
                 min-width: 100%;
                 .list {
-                    // border: red solid 1px;
                     display: flex;
                     flex-direction: column;
                     align-items: center;
@@ -378,8 +370,6 @@ hr {
         font-weight: 500;
         opacity: 0;
         transition: opacity 2s;
-
-
         &.active {
             opacity: 1;
         }
@@ -543,7 +533,6 @@ hr {
         .ribbon-wrap {
             width: 75px;
             height: 75px;
-            
             overflow: hidden;
             position: absolute;
             border-radius: 2px;
@@ -594,7 +583,6 @@ hr {
     position: relative;
     border: solid white 2px;
     .top {
-        // border: red solid 1px;
         min-height: 50%;
         display: flex;
         justify-content: space-between;
@@ -645,11 +633,11 @@ hr {
                 font-size: 20px;
                 line-height: 1.2em;
                 padding: 0 5px;
+                overflow: hidden;
             }
         }
     }
     .bottom {
-        // border: red solid 1px;
         min-height: 50%;
         display: flex;
         justify-content: left;
@@ -739,7 +727,6 @@ hr {
                 flex-wrap: wrap;
                 p {
                     padding: 0 5px;
-                    
                     font-weight: 400;
                     font-size: 12px;
                     line-height: 1.2em;
@@ -761,7 +748,6 @@ hr {
 .no-results {
     display: none;
     z-index: -1;
- 
     &.active {
         display: block;
         position: fixed;
@@ -787,17 +773,14 @@ hr {
     position: relative;
     opacity: 0;
     flex-wrap: wrap;
-    // border: 1px solid red;
     .pages {
         display: flex;
         justify-content: center;
         margin-bottom: 30px;
-        // border: 1px solid blue;
         position: absolute;
         top: 0;
         left: 50%;
         transform: translateX(-50%);
-        // flex-wrap: wrap;
         .page {
             display: inline-block;
             border-radius: 3px;
@@ -822,13 +805,25 @@ hr {
                 background-color: $primary-color-light;
             }
         }
+        .prev, .next {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            img {
+                height: 18px;
+                opacity: 0.4;
+            }
+            &.active {
+                cursor: pointer;
+            }
+        }
     }
     
     .records-on-page-container {
         display: flex;
         flex-direction: column;
         align-items: flex-end;
-        // border: 1px solid blue;
         select.records-on-page {
             background-color: white;
             color: $font-color;
@@ -840,9 +835,6 @@ hr {
             }
         }
         .label {
-            // position: absolute;
-            // right: 0;
-            // bottom: 20px;
             font-size: 11px;
             margin-top: 2px;
         }
@@ -877,7 +869,6 @@ select.cities option.active {
             align-items: center;
         }
     }
-    
 }
 
 @media (max-width: 600px) {
@@ -891,8 +882,6 @@ select.cities option.active {
         }
     }
     
-    
-    
     .pages-container {
         justify-content: center;
         .records-on-page-container {
@@ -900,7 +889,6 @@ select.cities option.active {
             align-items: center;
         }
     }
-    
 }
 
 @media (min-width: 950px) {

@@ -207,21 +207,33 @@ const summariseDownload = (recordsNumber) => {
 
 // show & hide MORE FILTERS //////////////////////////////////////////////////
 
-const dropDownBtnStart = () => {
-    dropDownLoc.addEventListener("click", () => {
+const showHideFilters = () => {
+    dropDownBtnLoc.classList.toggle("up");
+    if (dropDownFilterLoc.classList.contains("show")) {
+        dropDownFilterLoc.classList.remove("show");
+        dropDownFilterLoc.style.maxHeight = String(0) + "px";
+        moreFiltersLoc.classList.remove("hide");
+        lessFiltersLoc.classList.remove("show");
+    } else {
+        dropDownFilterLoc.classList.add("show");
+        dropDownFilterLoc.style.maxHeight = "1000px";
+        moreFiltersLoc.classList.add("hide");
+        lessFiltersLoc.classList.add("show");
+    }
+};
+
+const hideFilter = () => {
+    if (dropDownFilterLoc.classList.contains("show")) {
         dropDownBtnLoc.classList.toggle("up");
-        if (dropDownFilterLoc.classList.contains("show")) {
-            dropDownFilterLoc.classList.remove("show");
-            dropDownFilterLoc.style.maxHeight = String(0) + "px";
-            moreFiltersLoc.classList.remove("hide");
-            lessFiltersLoc.classList.remove("show");
-        } else {
-            dropDownFilterLoc.classList.add("show");
-            dropDownFilterLoc.style.maxHeight = "1000px";
-            moreFiltersLoc.classList.add("hide");
-            lessFiltersLoc.classList.add("show");
-        }
-    });
+        dropDownFilterLoc.classList.remove("show");
+        dropDownFilterLoc.style.maxHeight = String(0) + "px";
+        moreFiltersLoc.classList.remove("hide");
+        lessFiltersLoc.classList.remove("show");
+    }
+};
+
+const dropDownBtnStart = () => {
+    dropDownLoc.addEventListener("click", showHideFilters);
 
     dropDownLoc.classList.add("active");
 };
@@ -992,12 +1004,12 @@ const createFilteredRecordsArray = () => {
         filteredRecordsArray_10 = filteredRecordsArray_9;
     }
 
-    // recordsArray = filteredRecordsArray_10;
     recordsNumber = filteredRecordsArray_10.length;
     summariseDownload(recordsNumber);
     createRecordBoxes(filteredRecordsArray_10, 0, recordsOnPage);
     setPages(recordsNumber);
     filtersON = true;
+    hideFilter();
 };
 
 searchBtn.addEventListener("click", createFilteredRecordsArray);
@@ -1152,8 +1164,6 @@ salaryMarkLoc.addEventListener("change", function (e) {
     }
 });
 
-// set & change PAGE //////////////////////////////////////////////////////////
-
 const changePage = (pageBtn) => {
     pageButtonsLoc.forEach((el) => {
         el.classList.remove("active");
@@ -1165,26 +1175,257 @@ const changePage = (pageBtn) => {
     filtersON
         ? createRecordBoxes(filteredRecordsArray_10, firstRecord, lastRecord)
         : createRecordBoxes(allRecordsArray, firstRecord, lastRecord);
+    globActivePageNo = parseInt(pageBtn.innerText);
 };
 
-const setPages = (recordsNumber) => {
-    let pagesQuantity = Math.ceil(recordsNumber / recordsOnPage);
+let globActivePageNo;
 
-    pagesSwitchLoc.replaceChildren();
+const movePrevPagesBtns = () => {
+    let firstDispalyedPageNo = parseInt(
+        Array.from(document.querySelectorAll(".page")).shift().innerText
+    );
+    let lastDispalyedPageNo = parseInt(
+        Array.from(document.querySelectorAll(".page")).pop().innerText
+    );
 
-    for (n = 1; n <= pagesQuantity; n++) {
-        if (n === 1) {
+    let activePageNo;
+    activePageNo = document.querySelector(".page.active");
+
+    if (activePageNo) {
+        activePageNo = parseInt(activePageNo.innerText);
+    }
+
+    if (firstDispalyedPageNo > 1) {
+        pagesSwitchLoc.replaceChildren();
+
+        for (n = firstDispalyedPageNo - 1; n <= lastDispalyedPageNo - 1; n++) {
+            if (!activePageNo) {
+                activePageNo = globActivePageNo;
+            }
+            if (activePageNo && n === activePageNo) {
+                pagesSwitchLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<div class="page active">${n}</div>`
+                );
+            } else {
+                pagesSwitchLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<div class="page">${n}</div>`
+                );
+            }
+        }
+
+        if (lastDispalyedPageNo < pagesQuantityCalc + 1) {
             pagesSwitchLoc.insertAdjacentHTML(
                 "beforeend",
-                `<div class="page active">${n}</div>`
+                `<div class="next active"><img src="../img/chevron-right.svg" alt="" /></div>`
             );
+            let nextBtnLoc = document.querySelector(".next");
+            nextBtnLoc.addEventListener("click", () => {
+                moveNextPagesBtns();
+            });
         } else {
             pagesSwitchLoc.insertAdjacentHTML(
                 "beforeend",
-                `<div class="page">${n}</div>`
+                `<div class="next"><img src="" alt="" /></div>`
             );
         }
+
+        if (firstDispalyedPageNo > 2) {
+            pagesSwitchLoc.insertAdjacentHTML(
+                "afterbegin",
+                `<div class="prev active"><img src="../img/chevron-left.svg" alt="" /></div>`
+            );
+            let prevBtnLoc = document.querySelector(".prev");
+            prevBtnLoc.addEventListener("click", () => {
+                movePrevPagesBtns();
+            });
+        } else {
+            pagesSwitchLoc.insertAdjacentHTML(
+                "afterbegin",
+                `<div class="prev"><img src="" alt="" /></div>`
+            );
+        }
+
+        pageButtonsLoc = document.querySelectorAll(".page");
+        pageButtonsLoc.forEach((el) => {
+            el.addEventListener("click", (e) => {
+                changePage(e.target);
+            });
+        });
     }
+};
+
+const moveNextPagesBtns = () => {
+    let firstDispalyedPageNo = parseInt(
+        Array.from(document.querySelectorAll(".page")).shift().innerText
+    );
+    let lastDispalyedPageNo = parseInt(
+        Array.from(document.querySelectorAll(".page")).pop().innerText
+    );
+
+    let activePageNo;
+    activePageNo = document.querySelector(".page.active");
+    if (activePageNo) {
+        activePageNo = parseInt(activePageNo.innerText);
+        globActivePageNo = activePageNo;
+    }
+
+    if (lastDispalyedPageNo < pagesQuantityCalc) {
+        pagesSwitchLoc.replaceChildren();
+
+        for (n = firstDispalyedPageNo + 1; n <= lastDispalyedPageNo + 1; n++) {
+            if (!activePageNo) {
+                activePageNo = globActivePageNo;
+            }
+            if (activePageNo && n === activePageNo) {
+                pagesSwitchLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<div class="page active">${n}</div>`
+                );
+            } else {
+                pagesSwitchLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<div class="page">${n}</div>`
+                );
+            }
+        }
+
+        if (lastDispalyedPageNo < pagesQuantityCalc - 1) {
+            pagesSwitchLoc.insertAdjacentHTML(
+                "beforeend",
+                `<div class="next active"><img src="../img/chevron-right.svg" alt="" /></div>`
+            );
+            let nextBtnLoc = document.querySelector(".next");
+            nextBtnLoc.addEventListener("click", () => {
+                moveNextPagesBtns();
+            });
+        } else {
+            pagesSwitchLoc.insertAdjacentHTML(
+                "beforeend",
+                `<div class="next"><img src="" alt="" /></div>`
+            );
+        }
+
+        if (firstDispalyedPageNo > 0) {
+            pagesSwitchLoc.insertAdjacentHTML(
+                "afterbegin",
+                `<div class="prev active"><img src="../img/chevron-left.svg" alt="" /></div>`
+            );
+            let prevBtnLoc = document.querySelector(".prev");
+            prevBtnLoc.addEventListener("click", () => {
+                movePrevPagesBtns();
+            });
+        } else {
+            pagesSwitchLoc.insertAdjacentHTML(
+                "afterbegin",
+                `<div class="prev"><img src="" alt="" /></div>`
+            );
+        }
+
+        pageButtonsLoc = document.querySelectorAll(".page");
+        pageButtonsLoc.forEach((el) => {
+            el.addEventListener("click", (e) => {
+                changePage(e.target);
+            });
+        });
+    }
+};
+
+function getWidth() {
+    return Math.max(
+        document.body.scrollWidth,
+        document.documentElement.scrollWidth,
+        document.body.offsetWidth,
+        document.documentElement.offsetWidth,
+        document.documentElement.clientWidth
+    );
+}
+
+function getHeight() {
+    return Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.offsetHeight,
+        document.documentElement.clientHeight
+    );
+}
+
+let maxPageBtns;
+
+if (getWidth() < 500) {
+    maxPageBtns = 6;
+}
+if (getWidth() >= 500 && getWidth() < 700) {
+    maxPageBtns = 8;
+}
+if (getWidth() > 700 && getWidth() < 900) {
+    maxPageBtns = 10;
+}
+if (getWidth() > 900 && getWidth() < 1024) {
+    maxPageBtns = 15;
+}
+if (getWidth() > 1024) {
+    maxPageBtns = 20;
+}
+
+let pagesQuantityCalc;
+
+const setPages = (recordsNumber) => {
+    pagesQuantityCalc = Math.ceil(recordsNumber / recordsOnPage);
+
+    if (pagesQuantityCalc >= maxPageBtns) {
+        pagesSwitchLoc.replaceChildren();
+
+        for (n = 1; n <= maxPageBtns; n++) {
+            if (n === 1) {
+                pagesSwitchLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<div class="page active">${n}</div>`
+                );
+            } else {
+                pagesSwitchLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<div class="page">${n}</div>`
+                );
+            }
+        }
+        pagesSwitchLoc.insertAdjacentHTML(
+            "beforeend",
+            `<div class="next active"><img src="../img/chevron-right.svg" alt="" /></div>`
+        );
+        let nextBtnLoc = document.querySelector(".next");
+        nextBtnLoc.addEventListener("click", () => {
+            moveNextPagesBtns();
+        });
+    } else {
+        pagesSwitchLoc.replaceChildren();
+
+        for (n = 1; n <= pagesQuantityCalc; n++) {
+            if (n === 1) {
+                pagesSwitchLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<div class="page active">${n}</div>`
+                );
+            } else {
+                pagesSwitchLoc.insertAdjacentHTML(
+                    "beforeend",
+                    `<div class="page">${n}</div>`
+                );
+            }
+        }
+
+        pagesSwitchLoc.insertAdjacentHTML(
+            "beforeend",
+            `<div class="next"><img src="" alt="" /></div>`
+        );
+    }
+
+    pagesSwitchLoc.insertAdjacentHTML(
+        "afterbegin",
+        `<div class="prev"><img src="" alt="" /></div>`
+    );
 
     pageButtonsLoc = document.querySelectorAll(".page");
     pageButtonsLoc.forEach((el) => {
