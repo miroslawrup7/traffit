@@ -1218,7 +1218,7 @@ const movePrevPagesBtns = () => {
         if (lastDispalyedPageNo < pagesQuantityCalc + 1) {
             pagesSwitchLoc.insertAdjacentHTML(
                 "beforeend",
-                `<div class="next active"><img src="../img/chevron-right.svg" alt="" /></div>`
+                `<div class="next active"><img src="./img/chevron-right.svg" alt="" /></div>`
             );
             let nextBtnLoc = document.querySelector(".next");
             nextBtnLoc.addEventListener("click", () => {
@@ -1234,7 +1234,7 @@ const movePrevPagesBtns = () => {
         if (firstDispalyedPageNo > 2) {
             pagesSwitchLoc.insertAdjacentHTML(
                 "afterbegin",
-                `<div class="prev active"><img src="../img/chevron-left.svg" alt="" /></div>`
+                `<div class="prev active"><img src="./img/chevron-left.svg" alt="" /></div>`
             );
             let prevBtnLoc = document.querySelector(".prev");
             prevBtnLoc.addEventListener("click", () => {
@@ -1294,7 +1294,7 @@ const moveNextPagesBtns = () => {
         if (lastDispalyedPageNo < pagesQuantityCalc - 1) {
             pagesSwitchLoc.insertAdjacentHTML(
                 "beforeend",
-                `<div class="next active"><img src="../img/chevron-right.svg" alt="" /></div>`
+                `<div class="next active"><img src="./img/chevron-right.svg" alt="" /></div>`
             );
             let nextBtnLoc = document.querySelector(".next");
             nextBtnLoc.addEventListener("click", () => {
@@ -1310,7 +1310,7 @@ const moveNextPagesBtns = () => {
         if (firstDispalyedPageNo > 0) {
             pagesSwitchLoc.insertAdjacentHTML(
                 "afterbegin",
-                `<div class="prev active"><img src="../img/chevron-left.svg" alt="" /></div>`
+                `<div class="prev active"><img src="./img/chevron-left.svg" alt="" /></div>`
             );
             let prevBtnLoc = document.querySelector(".prev");
             prevBtnLoc.addEventListener("click", () => {
@@ -1393,7 +1393,7 @@ const setPages = (recordsNumber) => {
         }
         pagesSwitchLoc.insertAdjacentHTML(
             "beforeend",
-            `<div class="next active"><img src="../img/chevron-right.svg" alt="" /></div>`
+            `<div class="next active"><img src="./img/chevron-right.svg" alt="" /></div>`
         );
         let nextBtnLoc = document.querySelector(".next");
         nextBtnLoc.addEventListener("click", () => {
