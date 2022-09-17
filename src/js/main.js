@@ -515,13 +515,22 @@ createRecordsObjFromAPI(apiPage);
 // create HTML FILTERS LISTS //////////////////////////////////////////////////////
 
 const createFilterLists = () => {
+    let isSamsungBrowser = navigator.userAgent.match(/SamsungBrowser/i);
+    let isChromeBrowser = navigator.userAgent.match(/Chrome/i);
+
     if (filterBranchesList.length > 0) {
         filterBranchesList.sort(function (a, b) {
             return a.localeCompare(b);
         });
         rowHeight = filterBranchesList.length * 21 + 3;
         filterListMaxHeight = rowHeight;
-        branchesLoc.style.height = String(rowHeight) + "px";
+        if (getMobileOperatingSystem() === "unknown") {
+            branchesLoc.style.height = String(rowHeight) + "px";
+        } else if (isSamsungBrowser || isChromeBrowser) {
+            branchesLoc.style.height = "50px";
+        } else {
+            branchesLoc.style.height = String(rowHeight) + "px";
+        }
         filterBranchesList.forEach(function (el) {
             branchesLoc.insertAdjacentHTML(
                 "beforeend",
@@ -535,7 +544,13 @@ const createFilterLists = () => {
             return a.localeCompare(b);
         });
         rowHeight = filterJobFormList.length * 21 + 3;
-        jobFormLoc.style.height = String(rowHeight) + "px";
+        if (getMobileOperatingSystem() === "unknown") {
+            jobFormLoc.style.height = String(rowHeight) + "px";
+        } else if (isSamsungBrowser || isChromeBrowser) {
+            jobFormLoc.style.height = "50px";
+        } else {
+            jobFormLoc.style.height = String(rowHeight) + "px";
+        }
         filterJobFormList.forEach(function (el) {
             jobFormLoc.insertAdjacentHTML(
                 "beforeend",
@@ -549,7 +564,13 @@ const createFilterLists = () => {
             return a.localeCompare(b);
         });
         rowHeight = filterJobTypeList.length * 21 + 3;
-        jobTypeLoc.style.height = String(rowHeight) + "px";
+        if (getMobileOperatingSystem() === "unknown") {
+            jobTypeLoc.style.height = String(rowHeight) + "px";
+        } else if (isSamsungBrowser || isChromeBrowser) {
+            jobTypeLoc.style.height = "50px";
+        } else {
+            jobTypeLoc.style.height = String(rowHeight) + "px";
+        }
         filterJobTypeList.forEach(function (el) {
             jobTypeLoc.insertAdjacentHTML(
                 "beforeend",
@@ -563,7 +584,13 @@ const createFilterLists = () => {
             return a.localeCompare(b);
         });
         rowHeight = filterLangList.length * 21 + 3;
-        langLoc.style.height = String(rowHeight) + "px";
+        if (getMobileOperatingSystem() === "unknown") {
+            langLoc.style.height = String(rowHeight) + "px";
+        } else if (isSamsungBrowser || isChromeBrowser) {
+            langLoc.style.height = "50px";
+        } else {
+            langLoc.style.height = String(rowHeight) + "px";
+        }
         filterLangList.forEach(function (el) {
             langLoc.insertAdjacentHTML(
                 "beforeend",
@@ -1463,3 +1490,27 @@ clearFilterLoc.forEach((elemFiltr) => {
         });
     });
 });
+
+// Determine the mobile operating system.
+
+function getMobileOperatingSystem() {
+    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    // // Windows Phone must come first because its UA also contains "Android"
+    // if (/windows phone/i.test(userAgent)) {
+    //     return "Windows Phone";
+    // }
+
+    if (/android/i.test(userAgent)) {
+        return "Android";
+    }
+
+    // iOS detection
+    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        return "iOS";
+    }
+
+    return "unknown";
+}
+
+console.log(getMobileOperatingSystem());
