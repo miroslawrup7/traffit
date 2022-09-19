@@ -53,6 +53,13 @@ const searchBtn = document.querySelector(".search-btn");
 const clearFiltersLoc = document.querySelector(".clear-filters");
 const clearFilterLoc = document.querySelectorAll(".lists .list .clear-list");
 
+const salaryLoc = document.querySelector(".salary");
+const remoteWrapperLoc = document.querySelector(".remote-wrapper");
+const relocationWrapperLoc = document.querySelector(".relocation-wrapper");
+const langWrapperLoc = document.querySelector("#lang").closest("div");
+const locWrapperLoc = document.querySelector(".loc-container");
+const brancheWrapperLoc = document.querySelector("#branches").closest("div");
+
 let apiPage = 1;
 let rawAPIArray = [];
 let allRecordsArray = [];
@@ -72,7 +79,6 @@ let recordsOnPage = 20;
 let filterListMaxHeight = 0;
 
 let filtersON = false;
-let filteredRecordsArray_10 = [];
 
 searchInputLoc.value = "";
 recordsOnPageLoc.value = 20;
@@ -247,6 +253,10 @@ const pagesContainerStart = () => {
 const createRecordBoxes = (recordsArray, firstRecordNumber, recordsOnPage) => {
     resultsLoc.replaceChildren();
 
+    console.log(recordsArray);
+
+    console.log(filterConfigData);
+
     for (i = firstRecordNumber; i < recordsOnPage; i++) {
         // colouring of records by type of recruitment
 
@@ -254,17 +264,50 @@ const createRecordBoxes = (recordsArray, firstRecordNumber, recordsOnPage) => {
             let borderColorClass = "";
             let textColorClass = "";
 
-            if (recordsArray[i].recruitmentType === "PT") {
-                borderColorClass = "pt-border";
-                textColorClass = "pt-text";
-            }
-            if (recordsArray[i].recruitmentType === "RS") {
-                borderColorClass = "rs-border";
-                textColorClass = "rs-text";
-            }
-            if (recordsArray[i].recruitmentType === "WEW") {
-                borderColorClass = "wew-border";
-                textColorClass = "wew-text";
+            if (!filterConfigData.recruitmentType_colorOnly.length) {
+                if (recordsArray[i].recruitmentType === "PT") {
+                    borderColorClass = "pt-border";
+                    textColorClass = "pt-text";
+                }
+                if (recordsArray[i].recruitmentType === "RS") {
+                    borderColorClass = "rs-border";
+                    textColorClass = "rs-text";
+                }
+                if (recordsArray[i].recruitmentType === "WEW") {
+                    borderColorClass = "wew-border";
+                    textColorClass = "wew-text";
+                }
+            } else {
+                if (
+                    filterConfigData.recruitmentType_colorOnly.indexOf("PT") !==
+                    -1
+                ) {
+                    if (recordsArray[i].recruitmentType === "PT") {
+                        borderColorClass = "pt-border";
+                        textColorClass = "pt-text";
+                    }
+                }
+
+                if (
+                    filterConfigData.recruitmentType_colorOnly.indexOf("RS") !==
+                    -1
+                ) {
+                    if (recordsArray[i].recruitmentType === "RS") {
+                        borderColorClass = "rs-border";
+                        textColorClass = "rs-text";
+                    }
+                }
+
+                if (
+                    filterConfigData.recruitmentType_colorOnly.indexOf(
+                        "WEW"
+                    ) !== -1
+                ) {
+                    if (recordsArray[i].recruitmentType === "WEW") {
+                        borderColorClass = "wew-border";
+                        textColorClass = "wew-text";
+                    }
+                }
             }
 
             let formaZatrudnienia = "";
@@ -463,6 +506,27 @@ const createAwardedRecordBoxes = (recordsArray) => {
     }
 };
 
+let filterConfigData = {};
+
+// consider configuration filters ////////////////////////
+const getConfigFilter = () => {
+    const response = fetch("./config/config.json");
+    return response;
+};
+
+async function readConfigFilter() {
+    try {
+        const rawData = await getConfigFilter();
+        filterConfigData = await rawData.json();
+        createRecordsObjFromAPI(apiPage, filterConfigData);
+    } catch (e) {
+        console.error(e);
+        createRecordsObjFromAPI(apiPage);
+    }
+}
+
+readConfigFilter();
+
 // gets DATA FROM API ///////////////////////////////////////////////
 
 const getAPI = (apiPage) => {
@@ -483,13 +547,13 @@ const getAPI = (apiPage) => {
     return response;
 };
 
-const loopOnAPI = (jsonData) => {
+const loopOnAPI = (jsonData, filterConfigData) => {
     if (jsonData.length > 0) {
         // deactivate in local mode
         rawAPIArray = rawAPIArray.concat(jsonData); // deactivate in local mode
         // rawAPIArray = jsonData; // activate in local mode
         apiPage++; // deactivate in local mode
-        createRecordsObjFromAPI(apiPage); // deactivate in local mode
+        createRecordsObjFromAPI(apiPage, filterConfigData); // deactivate in local mode
     } else {
         // deactivate in local mode
         reworkData(rawAPIArray);
@@ -498,23 +562,49 @@ const loopOnAPI = (jsonData) => {
         createRecordBoxes(allRecordsArray, firstRecordNumber, recordsOnPage);
         createAwardedRecordBoxes(allRecordsArray);
         setPages(recordsNumber);
-        createFilterLists();
+        createFilterLists(filterConfigData);
         dropDownBtnStart();
         pagesContainerStart();
+        createFilteredRecordsArray();
     } // deactivate in local mode
 };
 
-async function createRecordsObjFromAPI(apiPage) {
+async function createRecordsObjFromAPI(apiPage, filterConfigData) {
     const rawData = await getAPI(apiPage);
     const jsonData = await rawData.json();
-    loopOnAPI(jsonData);
+    loopOnAPI(jsonData, filterConfigData);
 }
-
-createRecordsObjFromAPI(apiPage);
 
 // create HTML FILTERS LISTS //////////////////////////////////////////////////////
 
-const createFilterLists = () => {
+const createFilterLists = (filterConfigData) => {
+    // include external filter config ///////////////////
+    console.log(filterConfigData);
+
+    if (!filterConfigData.salary_visible) {
+        salaryLoc.classList.add("unactive");
+    }
+
+    if (!filterConfigData.relocation_visible) {
+        relocationWrapperLoc.classList.add("unactive");
+    }
+
+    if (!filterConfigData.language_visible) {
+        langWrapperLoc.classList.add("unactive");
+    }
+
+    if (!filterConfigData.remote_visible) {
+        remoteWrapperLoc.classList.add("unactive");
+    }
+
+    if (!filterConfigData.location_visible) {
+        locWrapperLoc.classList.add("unactive");
+    }
+
+    if (!filterConfigData.branche_visible) {
+        brancheWrapperLoc.classList.add("unactive");
+    }
+
     let isSamsungBrowser = navigator.userAgent.match(/SamsungBrowser/i);
     let isChromeBrowser = navigator.userAgent.match(/Chrome/i);
 
@@ -671,17 +761,28 @@ const createFilteredRecordsArray = () => {
     const countriesChildrenLoc = document.querySelectorAll(".countries option");
     const citiesChildrenLoc = document.querySelectorAll(".cities option");
 
+    console.log(filterConfigData);
+
     let filteredRecordsArray = allRecordsArray;
 
     // selectedBranches ////////////////
 
-    let selectedBranches = Array.from(branchesChildrenLoc)
-        .filter(function (elem) {
-            return elem.selected;
-        })
-        .map(function (elem) {
-            return elem.value;
-        });
+    let selectedBranches = [];
+
+    if (
+        filterConfigData.branche_filter.length &&
+        !filterConfigData.branche_visible
+    ) {
+        selectedBranches = filterConfigData.branche_filter;
+    } else {
+        selectedBranches = Array.from(branchesChildrenLoc)
+            .filter(function (elem) {
+                return elem.selected;
+            })
+            .map(function (elem) {
+                return elem.value;
+            });
+    }
 
     let filteredRecordsArray_1 = [];
 
@@ -766,14 +867,22 @@ const createFilteredRecordsArray = () => {
     }
 
     // selectedLangs ////////////////
+    let selectedLangs = [];
 
-    let selectedLangs = Array.from(langChildrenLoc)
-        .filter(function (elem) {
-            return elem.selected;
-        })
-        .map(function (elem) {
-            return elem.value;
-        });
+    if (
+        filterConfigData.language_filter.length &&
+        !filterConfigData.language_visible
+    ) {
+        selectedLangs = filterConfigData.language_filter;
+    } else {
+        selectedLangs = Array.from(langChildrenLoc)
+            .filter(function (elem) {
+                return elem.selected;
+            })
+            .map(function (elem) {
+                return elem.value;
+            });
+    }
 
     let filteredRecordsArray_4 = [];
 
@@ -843,23 +952,34 @@ const createFilteredRecordsArray = () => {
 
     let selectedCountry = [];
 
-    if (locationMarkLoc.checked) {
-        selectedCountry = Array.from(countriesChildrenLoc)
-            .filter(function (elem) {
-                if (elem.value) {
-                    return elem.selected;
-                }
-            })
-            .map(function (elem) {
-                if (elem.value) {
-                    return elem.value;
-                }
-            });
+    if (
+        filterConfigData.location_country_filter.length &&
+        !filterConfigData.location_visible
+    ) {
+        selectedCountry = filterConfigData.location_country_filter;
+    } else {
+        if (locationMarkLoc.checked) {
+            selectedCountry = Array.from(countriesChildrenLoc)
+                .filter(function (elem) {
+                    if (elem.value) {
+                        return elem.selected;
+                    }
+                })
+                .map(function (elem) {
+                    if (elem.value) {
+                        return elem.value;
+                    }
+                });
+        }
     }
 
     let filteredRecordsArray_6 = [];
 
-    if (locationMarkLoc.checked) {
+    if (
+        locationMarkLoc.checked ||
+        (filterConfigData.location_country_filter.length &&
+            !filterConfigData.location_visible)
+    ) {
         if (selectedCountry.length) {
             filteredRecordsArray_5.forEach((el, index) => {
                 let addFlag = false;
@@ -885,23 +1005,34 @@ const createFilteredRecordsArray = () => {
 
     let selectedCity = [];
 
-    if (locationMarkLoc.checked) {
-        selectedCity = Array.from(citiesChildrenLoc)
-            .filter(function (elem) {
-                if (elem.value) {
-                    return elem.selected;
-                }
-            })
-            .map(function (elem) {
-                if (elem.value) {
-                    return elem.value;
-                }
-            });
+    if (
+        filterConfigData.location_city_filter.length &&
+        !filterConfigData.location_visible
+    ) {
+        selectedCity = filterConfigData.location_city_filter;
+    } else {
+        if (locationMarkLoc.checked) {
+            selectedCity = Array.from(citiesChildrenLoc)
+                .filter(function (elem) {
+                    if (elem.value) {
+                        return elem.selected;
+                    }
+                })
+                .map(function (elem) {
+                    if (elem.value) {
+                        return elem.value;
+                    }
+                });
+        }
     }
 
     let filteredRecordsArray_7 = [];
 
-    if (locationMarkLoc.checked) {
+    if (
+        locationMarkLoc.checked ||
+        (filterConfigData.location_city_filter.length &&
+            !filterConfigData.location_visible)
+    ) {
         if (selectedCity.length) {
             let selectedDistance = 0;
 
@@ -959,7 +1090,10 @@ const createFilteredRecordsArray = () => {
 
     let filteredRecordsArray_8 = [];
 
-    if (remoteLoc.checked) {
+    if (
+        remoteLoc.checked ||
+        (filterConfigData.remote_filter && !filterConfigData.remote_visible)
+    ) {
         filteredRecordsArray_7.forEach((el, index) => {
             let addFlag = false;
 
@@ -997,7 +1131,7 @@ const createFilteredRecordsArray = () => {
 
     // searchText ////////////////
 
-    filteredRecordsArray_10 = [];
+    let filteredRecordsArray_10 = [];
 
     let searchText = searchInputLoc.value;
 
@@ -1031,9 +1165,36 @@ const createFilteredRecordsArray = () => {
         filteredRecordsArray_10 = filteredRecordsArray_9;
     }
 
-    recordsNumber = filteredRecordsArray_10.length;
+    // selectedRecruitmentType (coloring of records) ////////////////
+    let selectedRecruitmentType = [];
+
+    if (filterConfigData.recruitmentType_filter.length) {
+        selectedRecruitmentType = filterConfigData.recruitmentType_filter;
+    }
+
+    let filteredRecordsArray_11 = [];
+
+    if (selectedRecruitmentType.length !== 0) {
+        filteredRecordsArray_10.forEach((el, index) => {
+            let addFlag = false;
+
+            selectedRecruitmentType.forEach((selectedFiltr) => {
+                if (el.recruitmentType === selectedFiltr) {
+                    addFlag = true;
+                }
+            });
+
+            if (addFlag) {
+                filteredRecordsArray_11.push(el);
+            }
+        });
+    } else {
+        filteredRecordsArray_11 = filteredRecordsArray_10;
+    }
+
+    recordsNumber = filteredRecordsArray_11.length;
     summariseDownload(recordsNumber);
-    createRecordBoxes(filteredRecordsArray_10, 0, recordsOnPage);
+    createRecordBoxes(filteredRecordsArray_11, 0, recordsOnPage);
     setPages(recordsNumber);
     filtersON = true;
     hideFilter();
@@ -1200,7 +1361,7 @@ const changePage = (pageBtn) => {
         recordsOnPage * parseInt(pageBtn.innerText) - recordsOnPage;
     let lastRecord = recordsOnPage * parseInt(pageBtn.innerText);
     filtersON
-        ? createRecordBoxes(filteredRecordsArray_10, firstRecord, lastRecord)
+        ? createRecordBoxes(filteredRecordsArray_11, firstRecord, lastRecord)
         : createRecordBoxes(allRecordsArray, firstRecord, lastRecord);
     globActivePageNo = parseInt(pageBtn.innerText);
 };
@@ -1468,7 +1629,7 @@ recordsOnPageLoc.addEventListener("change", (e) => {
     recordsOnPage = parseInt(e.target.value);
 
     filtersON
-        ? createRecordBoxes(filteredRecordsArray_10, 0, recordsOnPage)
+        ? createRecordBoxes(filteredRecordsArray_11, 0, recordsOnPage)
         : createRecordBoxes(allRecordsArray, 0, recordsOnPage);
     setPages(recordsNumber);
 });
@@ -1496,21 +1657,13 @@ clearFilterLoc.forEach((elemFiltr) => {
 function getMobileOperatingSystem() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
-    // // Windows Phone must come first because its UA also contains "Android"
-    // if (/windows phone/i.test(userAgent)) {
-    //     return "Windows Phone";
-    // }
-
     if (/android/i.test(userAgent)) {
         return "Android";
     }
 
-    // iOS detection
     if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
         return "iOS";
     }
 
     return "unknown";
 }
-
-console.log(getMobileOperatingSystem());

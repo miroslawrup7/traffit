@@ -1,0 +1,21 @@
+{
+    "remote_visible": false,
+    "language_visible": false, 
+    "branche_visible": false,
+    "location_visible": false,
+    
+
+    "salary_visible": false,
+    "relocation_visible": false,
+    
+    
+    "remote_filter": false,
+    "language_filter": [],
+    "branche_filter": [],
+    "location_country_filter": [],
+    "location_city_filter": [],
+    "recruitmentType_filter" : [],
+
+
+    "recruitmentType_colorOnly" : []
+}

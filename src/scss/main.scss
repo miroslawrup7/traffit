@@ -220,6 +220,9 @@ hr {
         .salary {
             display: flex;
             margin-bottom: 20px;
+            &.unactive {
+                display: none;
+            }
         }
         .loc-and-checkboxes {
             display: flex;
@@ -231,6 +234,9 @@ hr {
                 flex-grow: 1;
                 justify-content: center;
                 flex-wrap: wrap;
+                &.unactive {
+                    display: none;
+                }
                 .checkbox-container {
                     display: flex;
                 }
@@ -285,6 +291,12 @@ hr {
 
             .checkboxes-container {
                 display: flex;
+                .relocation-wrapper.unactive {
+                    display: none;
+                }
+                .remote-wrapper.unactive {
+                    display: none;
+                }
             }
         }
         .lists {
@@ -302,6 +314,9 @@ hr {
                     flex-direction: column;
                     align-items: center;
                     position: relative;
+                    &.unactive {
+                        display: none;
+                    }
                     label {
                         margin-bottom: 5px;
                         border-bottom: 2px solid $primary-color;

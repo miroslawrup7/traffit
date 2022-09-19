@@ -70,8 +70,7 @@ function clearScripts() {
 }
 
 function copyHtml() {
-    return src(paths.html.src) // kopiowanie plików html do dist
-        .pipe(dest(paths.html.dest));
+    return src(paths.html.src).pipe(dest(paths.html.dest));
 }
 
 function optimizeImages() {
