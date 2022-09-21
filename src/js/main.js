@@ -78,6 +78,8 @@ let recordsOnPage = 20;
 
 let filterListMaxHeight = 0;
 
+let filteredRecordsArray_11 = [];
+
 let filtersON = false;
 
 searchInputLoc.value = "";
@@ -252,10 +254,6 @@ const pagesContainerStart = () => {
 
 const createRecordBoxes = (recordsArray, firstRecordNumber, recordsOnPage) => {
     resultsLoc.replaceChildren();
-
-    console.log(recordsArray);
-
-    console.log(filterConfigData);
 
     for (i = firstRecordNumber; i < recordsOnPage; i++) {
         // colouring of records by type of recruitment
@@ -579,7 +577,6 @@ async function createRecordsObjFromAPI(apiPage, filterConfigData) {
 
 const createFilterLists = (filterConfigData) => {
     // include external filter config ///////////////////
-    console.log(filterConfigData);
 
     if (!filterConfigData.salary_visible) {
         salaryLoc.classList.add("unactive");
@@ -760,8 +757,6 @@ const createFilteredRecordsArray = () => {
     const langChildrenLoc = document.querySelectorAll(".lang option");
     const countriesChildrenLoc = document.querySelectorAll(".countries option");
     const citiesChildrenLoc = document.querySelectorAll(".cities option");
-
-    console.log(filterConfigData);
 
     let filteredRecordsArray = allRecordsArray;
 
@@ -1172,8 +1167,6 @@ const createFilteredRecordsArray = () => {
         selectedRecruitmentType = filterConfigData.recruitmentType_filter;
     }
 
-    let filteredRecordsArray_11 = [];
-
     if (selectedRecruitmentType.length !== 0) {
         filteredRecordsArray_10.forEach((el, index) => {
             let addFlag = false;
@@ -1563,7 +1556,7 @@ let pagesQuantityCalc;
 const setPages = (recordsNumber) => {
     pagesQuantityCalc = Math.ceil(recordsNumber / recordsOnPage);
 
-    if (pagesQuantityCalc >= maxPageBtns) {
+    if (pagesQuantityCalc > maxPageBtns) {
         pagesSwitchLoc.replaceChildren();
 
         for (n = 1; n <= maxPageBtns; n++) {
