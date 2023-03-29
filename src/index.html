@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="pl">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Access-Control-Allow-Origin" content="http://localhost:3000/">
     <link rel="stylesheet" href="./css/main.min.css?cache_bust=123" />
 
     <title>Grupa Progres</title>
 </head>
+
 <body>
     <header></header>
     <main>
@@ -53,7 +56,8 @@
                             <div class="slider-container">
                                 <div class="container unactive">
                                     <div class="slider-track"></div>
-                                    <input type="range" min="0" max="400" value="0" step="10" id="loc-slider" oninput="slideDistance()" disabled>
+                                    <input type="range" min="0" max="400" value="0" step="10" id="loc-slider"
+                                        oninput="slideDistance()" disabled>
                                 </div>
                             </div>
                         </div>
@@ -86,7 +90,7 @@
                         </label>
                         <label class="label-text" for="salary-mark">Stawka</label>
                     </div>
-                    
+
                     <div class="slider-container">
                         <div class="slider-values unactive">
                             <span id="range1">0</span>
@@ -95,14 +99,16 @@
                         </div>
                         <div class="container unactive">
                             <div class="slider-track"></div>
-                            <input type="range" min="0" max="100000" value="0" id="slider-1" oninput="slideOne()" disabled>
-                            <input type="range" min="0" max="100000" value="100000" id="slider-2" oninput="slideTwo()" disabled>
+                            <input type="range" min="0" max="100000" value="0" id="slider-1" oninput="slideOne()"
+                                disabled>
+                            <input type="range" min="0" max="100000" value="100000" id="slider-2" oninput="slideTwo()"
+                                disabled>
                         </div>
                     </div>
                 </div>
 
                 <div class="lists">
-                    
+
                     <div class="two-lists-conatainer">
 
                         <div class="list">
@@ -151,7 +157,7 @@
         <div class="pages-container">
             <div class="pages"></div>
             <div class="records-on-page-container">
-                <select class="records-on-page" name="records-on-page" id="records-on-page" >
+                <select class="records-on-page" name="records-on-page" id="records-on-page">
                     <option>10</option>
                     <option selected="selected">20</option>
                     <option>50</option>
@@ -168,4 +174,5 @@
 
     <script src="./js/all.min.js?cache_bust=123"></script>
 </body>
+
 </html>
